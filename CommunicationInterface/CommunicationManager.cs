@@ -33,8 +33,16 @@ namespace Communication.Interface
             // Query from external assemblies
             foreach (string FileName in DLLFileNames)
             {
-                Assembly DLLAssembly = Assembly.LoadFrom(FileName);
-                QueryImplementationFromAssembly(ImplementationDictionary, DLLAssembly);
+                Assembly DLLAssembly = null;
+                try
+                {
+                    DLLAssembly = Assembly.LoadFrom(FileName);
+                    if (DLLAssembly != null)
+                    {
+                        QueryImplementationFromAssembly(ImplementationDictionary, DLLAssembly);
+                    }
+                }
+                catch (Exception) { }   // Load win32 dll will cause exception, Ignore this kind of exception
             }
 
             // Query implementation in current assembly
