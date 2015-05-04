@@ -174,15 +174,15 @@ namespace Communication.Interface
         /// <returns>communiction viewer instance</returns>
         public static CommunicationViewer InitCommunicationViewer()
         {
-            return InitCommunicationViewer(IntPtr.Zero);
+            return InitCommunicationViewer(DockType.None);
         }
 
         /// <summary>
         /// Initial communiction viewer
         /// </summary>
-        /// <param name="Hwnd">Parent window handle</param>
+        /// <param name="Dock">Specifies the position which communication viewer will dock to.</param>
         /// <returns>communiction viewer instance</returns>
-        public static CommunicationViewer InitCommunicationViewer(IntPtr Hwnd)
+        public static CommunicationViewer InitCommunicationViewer(DockType Dock)
         {
             if (Viewer == null)
             {
@@ -190,7 +190,7 @@ namespace Communication.Interface
                 {
                     if (Viewer == null)
                     {
-                        Viewer = new CommunicationViewer(Hwnd);
+                        Viewer = new CommunicationViewer(Dock);
                     }
                 }
             }

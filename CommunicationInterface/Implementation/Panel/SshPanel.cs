@@ -59,7 +59,7 @@ namespace Communication.Interface.Implementation.Panel
         {
             if (InvokeRequired)
             {
-                this.Invoke(new UpdateSshKeyFile(SetSshKeyFile), value);
+                this.BeginInvoke(new UpdateSshKeyFile(SetSshKeyFile), value);
             }
             else
             {

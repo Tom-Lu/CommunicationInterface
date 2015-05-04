@@ -9,6 +9,18 @@ namespace Communication.Interface.Interop
 {
     public class Win32Window
     {
+        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        private static extern bool EnumWindows(EnumThreadWindowsCallback callback, IntPtr extraData);
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        private static extern int GetWindowThreadProcessId(HandleRef handle, out int processId);
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
+        private static extern IntPtr GetWindow(HandleRef hWnd, int uCmd);
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
+        private static extern bool IsWindowVisible(HandleRef hWnd);
+
         private bool haveMainWindow = false;
         private IntPtr mainWindowHandle = IntPtr.Zero;
         private int processId = 0;
@@ -51,18 +63,6 @@ namespace Communication.Interface.Interop
         {
             return (!(GetWindow(new HandleRef(this, handle), 4) != IntPtr.Zero) && IsWindowVisible(new HandleRef(this, handle)));
         }
-
-        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern bool EnumWindows(EnumThreadWindowsCallback callback, IntPtr extraData);
-
-        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern int GetWindowThreadProcessId(HandleRef handle, out int processId);
-
-        [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
-        private static extern IntPtr GetWindow(HandleRef hWnd, int uCmd);
-
-        [DllImport("user32.dll", CharSet = CharSet.Auto)]
-        private static extern bool IsWindowVisible(HandleRef hWnd);
 
     }
 }

@@ -148,14 +148,14 @@
             this.InputControlBtn.Text = "Enable Input";
             this.InputControlBtn.Click += new System.EventHandler(this.InputControlBtn_Click);
             // 
-            // CommIndicator
+            // CommunicationIndicator
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.Controls.Add(this.PanelLayout);
             this.Margin = new System.Windows.Forms.Padding(0);
-            this.Name = "CommIndicator";
+            this.Name = "CommunicationIndicator";
             this.Size = new System.Drawing.Size(327, 76);
             this.PanelLayout.ResumeLayout(false);
             this.PanelLayout.PerformLayout();

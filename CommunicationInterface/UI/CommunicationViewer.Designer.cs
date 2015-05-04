@@ -31,7 +31,12 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CommunicationViewer));
             this.ConsoleHost = new System.Windows.Forms.TabControl();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
-            this.toolStripDockBtn = new System.Windows.Forms.ToolStripButton();
+            this.toolStripDockBtn = new System.Windows.Forms.ToolStripDropDownButton();
+            this.toolStripDockNone = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripDockLeft = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripDockTop = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripDockRight = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripDockBottom = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripTopMostBtn = new System.Windows.Forms.ToolStripButton();
             this.toolStripTransparenceBtn = new System.Windows.Forms.ToolStripDropDownButton();
             this.toolStripTransparenceLow = new System.Windows.Forms.ToolStripMenuItem();
@@ -65,16 +70,54 @@
             // 
             // toolStripDockBtn
             // 
-            this.toolStripDockBtn.Checked = true;
-            this.toolStripDockBtn.CheckState = System.Windows.Forms.CheckState.Checked;
             this.toolStripDockBtn.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.toolStripDockBtn.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripDockNone,
+            this.toolStripDockLeft,
+            this.toolStripDockTop,
+            this.toolStripDockRight,
+            this.toolStripDockBottom});
             this.toolStripDockBtn.Image = global::Communication.Interface.Properties.Resources.Dock;
             this.toolStripDockBtn.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripDockBtn.Name = "toolStripDockBtn";
-            this.toolStripDockBtn.Size = new System.Drawing.Size(23, 22);
+            this.toolStripDockBtn.Size = new System.Drawing.Size(29, 22);
             this.toolStripDockBtn.Text = "Dock to main window";
             this.toolStripDockBtn.ToolTipText = "Dock To Main Window";
-            this.toolStripDockBtn.Click += new System.EventHandler(this.toolStripDockBtn_Click);
+            // 
+            // toolStripDockNone
+            // 
+            this.toolStripDockNone.Name = "toolStripDockNone";
+            this.toolStripDockNone.Size = new System.Drawing.Size(152, 22);
+            this.toolStripDockNone.Text = "None";
+            this.toolStripDockNone.Click += new System.EventHandler(this.toolStripDockNone_Click);
+            // 
+            // toolStripDockLeft
+            // 
+            this.toolStripDockLeft.Name = "toolStripDockLeft";
+            this.toolStripDockLeft.Size = new System.Drawing.Size(152, 22);
+            this.toolStripDockLeft.Text = "Left";
+            this.toolStripDockLeft.Click += new System.EventHandler(this.toolStripDockLeft_Click);
+            // 
+            // toolStripDockTop
+            // 
+            this.toolStripDockTop.Name = "toolStripDockTop";
+            this.toolStripDockTop.Size = new System.Drawing.Size(152, 22);
+            this.toolStripDockTop.Text = "Top";
+            this.toolStripDockTop.Click += new System.EventHandler(this.toolStripDockTop_Click);
+            // 
+            // toolStripDockRight
+            // 
+            this.toolStripDockRight.Name = "toolStripDockRight";
+            this.toolStripDockRight.Size = new System.Drawing.Size(152, 22);
+            this.toolStripDockRight.Text = "Right";
+            this.toolStripDockRight.Click += new System.EventHandler(this.toolStripDockRight_Click);
+            // 
+            // toolStripDockBottom
+            // 
+            this.toolStripDockBottom.Name = "toolStripDockBottom";
+            this.toolStripDockBottom.Size = new System.Drawing.Size(152, 22);
+            this.toolStripDockBottom.Text = "Bottom";
+            this.toolStripDockBottom.Click += new System.EventHandler(this.toolStripDockBottom_Click);
             // 
             // toolStripTopMostBtn
             // 
@@ -105,32 +148,32 @@
             // toolStripTransparenceLow
             // 
             this.toolStripTransparenceLow.Name = "toolStripTransparenceLow";
-            this.toolStripTransparenceLow.Size = new System.Drawing.Size(152, 22);
+            this.toolStripTransparenceLow.Size = new System.Drawing.Size(117, 22);
             this.toolStripTransparenceLow.Text = "Low";
             this.toolStripTransparenceLow.Click += new System.EventHandler(this.toolStripTransparenceLow_Click);
             // 
             // toolStripTransparenceMid
             // 
             this.toolStripTransparenceMid.Name = "toolStripTransparenceMid";
-            this.toolStripTransparenceMid.Size = new System.Drawing.Size(152, 22);
+            this.toolStripTransparenceMid.Size = new System.Drawing.Size(117, 22);
             this.toolStripTransparenceMid.Text = "Middle";
             this.toolStripTransparenceMid.Click += new System.EventHandler(this.toolStripTransparenceMid_Click);
             // 
             // toolStripTransparenceHigh
             // 
             this.toolStripTransparenceHigh.Name = "toolStripTransparenceHigh";
-            this.toolStripTransparenceHigh.Size = new System.Drawing.Size(152, 22);
+            this.toolStripTransparenceHigh.Size = new System.Drawing.Size(117, 22);
             this.toolStripTransparenceHigh.Text = "High";
             this.toolStripTransparenceHigh.Click += new System.EventHandler(this.toolStripTransparenceHigh_Click);
             // 
-            // CommViewer
+            // CommunicationViewer
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(685, 322);
             this.Controls.Add(this.toolStrip1);
             this.Controls.Add(this.ConsoleHost);
-            this.Name = "CommViewer";
+            this.Name = "CommunicationViewer";
             this.Text = "CommViewer";
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
@@ -143,12 +186,17 @@
 
         private System.Windows.Forms.TabControl ConsoleHost;
         private System.Windows.Forms.ToolStrip toolStrip1;
-        private System.Windows.Forms.ToolStripButton toolStripDockBtn;
         private System.Windows.Forms.ToolStripButton toolStripTopMostBtn;
         private System.Windows.Forms.ToolStripDropDownButton toolStripTransparenceBtn;
         private System.Windows.Forms.ToolStripMenuItem toolStripTransparenceLow;
         private System.Windows.Forms.ToolStripMenuItem toolStripTransparenceMid;
         private System.Windows.Forms.ToolStripMenuItem toolStripTransparenceHigh;
+        private System.Windows.Forms.ToolStripDropDownButton toolStripDockBtn;
+        private System.Windows.Forms.ToolStripMenuItem toolStripDockNone;
+        private System.Windows.Forms.ToolStripMenuItem toolStripDockLeft;
+        private System.Windows.Forms.ToolStripMenuItem toolStripDockTop;
+        private System.Windows.Forms.ToolStripMenuItem toolStripDockRight;
+        private System.Windows.Forms.ToolStripMenuItem toolStripDockBottom;
 
 
     }

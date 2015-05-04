@@ -14,36 +14,45 @@ using Communication.Interface.Interop;
 
 namespace Communication.Interface.UI
 {
+    public enum DockType { None, Top, Left, Bottom, Right };
+
     public partial class CommunicationViewer : Form
     {
         private enum TransparenceLevel { Low, Mid, High };
         private IntPtr MainHwnd = IntPtr.Zero;
+        private DockType DockPos = DockType.None;
+        private System.Threading.Thread ViewerThread = null;
         private System.Threading.Timer WindowPosUpdateTimer = null;
         private Dictionary<ICommunicationInterface, TabPage> IndicatorDictionary = null;
         private Win32Interop.Rect LastPos;
 
-        public CommunicationViewer() : this(IntPtr.Zero)
+        public CommunicationViewer() : this(DockType.None)
         {
             InitializeComponent();
             IndicatorDictionary = new Dictionary<ICommunicationInterface, TabPage>();
         }
 
-        public CommunicationViewer(IntPtr Hwnd)
+        public CommunicationViewer(DockType Dock)
         {
             InitializeComponent();
 
             IndicatorDictionary = new Dictionary<ICommunicationInterface, TabPage>();
-            toolStripDockBtn.Checked = true;
             toolStripTopMostBtn.Checked = false;
             this.TopMost = false;
-            SetTransparenceLevel(TransparenceLevel.Low);
 
-            MainHwnd = Hwnd;
-
+            MainHwnd = Win32Window.GetCurrentProcessMainWindowHandle();
             if (MainHwnd != IntPtr.Zero)
             {
+                toolStripDockBtn.Enabled = true;
                 WindowPosUpdateTimer = new System.Threading.Timer(new TimerCallback(ViewerPosUpdateHandler), null, Timeout.Infinite, 300);
             }
+            else
+            {
+                toolStripDockBtn.Enabled = false;
+            }
+
+            SetTransparenceLevel(TransparenceLevel.Low);
+            SetDockType(Dock);
 
             this.VisibleChanged += new EventHandler(Viewer_VisibleChanged);
         }
@@ -56,7 +65,7 @@ namespace Communication.Interface.UI
                 WindowPosUpdateTimer.Dispose();
                 WindowPosUpdateTimer = null;
             }
-            CloseWindow();
+            ReleaseViewer();
         }
 
         delegate void ShowViewerDelegate();
@@ -64,13 +73,18 @@ namespace Communication.Interface.UI
         {
             if (this.InvokeRequired)
             {
-                this.Invoke(new ShowViewerDelegate(ShowViewer), null);
+                this.BeginInvoke(new ShowViewerDelegate(ShowViewer), null);
             }
             else
             {
                 if (!this.Visible)
                 {
-                    Show();
+                    // Show();
+                    ViewerThread = new Thread(new ParameterizedThreadStart(delegate(object obj)
+                        {
+                            ShowDialog();
+                        }));
+                    ViewerThread.Start();
                 }
                 else
                 {
@@ -88,7 +102,7 @@ namespace Communication.Interface.UI
         {
             if (this.InvokeRequired)
             {
-                this.Invoke(new HideViewerDelegate(HideViewer), null);
+                this.BeginInvoke(new HideViewerDelegate(HideViewer), null);
             }
             else
             {
@@ -99,17 +113,84 @@ namespace Communication.Interface.UI
             }
         }
 
-        delegate void CloseWindowDelegate();
-        public void CloseWindow()
+        delegate void ReleaseViewerDelegate();
+        public void ReleaseViewer()
         {
             if (this.InvokeRequired)
             {
-                this.Invoke(new CloseWindowDelegate(CloseWindow), null);
+                this.BeginInvoke(new ReleaseViewerDelegate(ReleaseViewer), null);
             }
             else
             {
-                Close();
+                if (Visible)
+                {
+                    Close();
+                    Dispose();
+                }
             }
+        }
+
+        public void WaitForClose()
+        {
+            if (ViewerThread != null)
+            {
+                ViewerThread.Join();
+            }
+        }
+
+        private void SetDockType(DockType Dock)
+        {
+            switch (Dock)
+            {
+                case DockType.None:
+                    {
+                        toolStripDockNone.Checked = true;
+                        toolStripDockLeft.Checked = false;
+                        toolStripDockTop.Checked = false;
+                        toolStripDockRight.Checked = false;
+                        toolStripDockBottom.Checked = false;
+                    }
+                    break;
+                case DockType.Left:
+                    {
+                        toolStripDockNone.Checked = false;
+                        toolStripDockLeft.Checked = true;
+                        toolStripDockTop.Checked = false;
+                        toolStripDockRight.Checked = false;
+                        toolStripDockBottom.Checked = false;
+                    }
+                    break;
+                case DockType.Top:
+                    {
+                        toolStripDockNone.Checked = false;
+                        toolStripDockLeft.Checked = false;
+                        toolStripDockTop.Checked = true;
+                        toolStripDockRight.Checked = false;
+                        toolStripDockBottom.Checked = false;
+                    }
+                    break;
+                case DockType.Right:
+                    {
+                        toolStripDockNone.Checked = false;
+                        toolStripDockLeft.Checked = false;
+                        toolStripDockTop.Checked = false;
+                        toolStripDockRight.Checked = true;
+                        toolStripDockBottom.Checked = false;
+                    }
+                    break;
+                case DockType.Bottom:
+                    {
+                        toolStripDockNone.Checked = false;
+                        toolStripDockLeft.Checked = false;
+                        toolStripDockTop.Checked = false;
+                        toolStripDockRight.Checked = false;
+                        toolStripDockBottom.Checked = true;
+                    }
+                    break;
+            }
+
+            this.DockPos = Dock;
+            LastPos = Win32Interop.Rect.Zero();
         }
 
         private void SetTransparenceLevel(TransparenceLevel level)
@@ -139,7 +220,7 @@ namespace Communication.Interface.UI
 
         private void Viewer_VisibleChanged(object sender, EventArgs e)
         {
-            if (MainHwnd != IntPtr.Zero)
+            if (MainHwnd != IntPtr.Zero && DockPos != DockType.None)
             {
                 if (this.Visible)
                 {
@@ -154,7 +235,7 @@ namespace Communication.Interface.UI
 
         private void ViewerPosUpdateHandler(object obj)
         {
-            if (MainHwnd != IntPtr.Zero)
+            if (MainHwnd != IntPtr.Zero && DockPos != DockType.None)
             {
                 if (Win32Interop.IsWindowVisible(MainHwnd))
                 {
@@ -226,19 +307,46 @@ namespace Communication.Interface.UI
         }
 
         delegate void ViewerPosUpdateDelegate(Win32Interop.Rect WinPos);
-        public void ViewerPosUpdate(Win32Interop.Rect WinPos)
+        public void ViewerPosUpdate(Win32Interop.Rect MainWindowPos)
         {
             if (this.InvokeRequired)
             {
-                this.Invoke(new ViewerPosUpdateDelegate(ViewerPosUpdate), new object[] { WinPos });
+                this.BeginInvoke(new ViewerPosUpdateDelegate(ViewerPosUpdate), new object[] { MainWindowPos });
             }
             else
             {
-                if (toolStripDockBtn.Checked)
+                switch (DockPos)
                 {
-                    this.Left = WinPos.Right;
-                    this.Top = WinPos.Top;
-                    this.Height = WinPos.Bottom - WinPos.Top;
+                    case DockType.None:
+                        break;
+                    case DockType.Left:
+                        {
+                            this.Left = MainWindowPos.Left - this.Width;
+                            this.Top = MainWindowPos.Top;
+                            this.Height = MainWindowPos.Bottom - MainWindowPos.Top;
+                        }
+                        break;
+                    case DockType.Top:
+                        {
+                            this.Left = MainWindowPos.Left;
+                            this.Top = MainWindowPos.Top - this.Height;
+                            this.Width = MainWindowPos.Right - MainWindowPos.Left;
+                        }
+                        break;
+                    case DockType.Right:
+                        {
+                            this.Left = MainWindowPos.Right;
+                            this.Top = MainWindowPos.Top;
+                            this.Height = MainWindowPos.Bottom - MainWindowPos.Top;
+                        }
+                        break;
+                    case DockType.Bottom:
+                        {
+                            this.Left = MainWindowPos.Left;
+                            this.Top = MainWindowPos.Bottom;
+                            this.Width = MainWindowPos.Right - MainWindowPos.Left;
+                        }
+                        break;
                 }
             }
         }
@@ -286,7 +394,7 @@ namespace Communication.Interface.UI
         {
             if (this.InvokeRequired)
             {
-                this.Invoke(new AddIndicatorPageDelegate(AddIndicatorPage), new object[] { IndicatorPage });
+                this.BeginInvoke(new AddIndicatorPageDelegate(AddIndicatorPage), new object[] { IndicatorPage });
             }
             else
             {
@@ -299,7 +407,7 @@ namespace Communication.Interface.UI
         {
             if (this.InvokeRequired)
             {
-                this.Invoke(new RemoveIndicatorPageDelegate(RemoveIndicatorPage), new object[] { IndicatorPage });
+                this.BeginInvoke(new RemoveIndicatorPageDelegate(RemoveIndicatorPage), new object[] { IndicatorPage });
             }
             else
             {
@@ -312,7 +420,7 @@ namespace Communication.Interface.UI
         {
             if (this.InvokeRequired)
             {
-                this.Invoke(new SortIndicatorPagesDelegate(SortIndicatorPages), null);
+                this.BeginInvoke(new SortIndicatorPagesDelegate(SortIndicatorPages), null);
             }
             else
             {
@@ -374,9 +482,44 @@ namespace Communication.Interface.UI
             }
         }
 
-        private void toolStripDockBtn_Click(object sender, EventArgs e)
+        private void toolStripDockNone_Click(object sender, EventArgs e)
         {
-            toolStripDockBtn.Checked = !toolStripDockBtn.Checked;
+            if (!toolStripDockNone.Checked)
+            {
+                SetDockType(DockType.None);
+            }
+        }
+
+        private void toolStripDockLeft_Click(object sender, EventArgs e)
+        {
+            if (!toolStripDockLeft.Checked)
+            {
+                SetDockType(DockType.Left);
+            }
+        }
+
+        private void toolStripDockTop_Click(object sender, EventArgs e)
+        {
+            if (!toolStripDockTop.Checked)
+            {
+                SetDockType(DockType.Top);
+            }
+        }
+
+        private void toolStripDockRight_Click(object sender, EventArgs e)
+        {
+            if (!toolStripDockRight.Checked)
+            {
+                SetDockType(DockType.Right);
+            }
+        }
+
+        private void toolStripDockBottom_Click(object sender, EventArgs e)
+        {
+            if (!toolStripDockBottom.Checked)
+            {
+                SetDockType(DockType.Bottom);
+            }
         }
 
         private void toolStripTopMostBtn_Click(object sender, EventArgs e)

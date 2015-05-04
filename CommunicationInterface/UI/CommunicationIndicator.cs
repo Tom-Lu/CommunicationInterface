@@ -9,6 +9,7 @@ using System.Windows.Forms;
 using System.Reflection;
 using Communication.Interface;
 using System.Threading;
+using System.Runtime.InteropServices;
 
 namespace Communication.Interface.UI
 {
@@ -98,7 +99,7 @@ namespace Communication.Interface.UI
         {
             if (this.InvokeRequired)
             {
-                this.Invoke(new ConnectionStringDelegate(ConnectionStringProxy), new object[] { text });
+                this.BeginInvoke(new ConnectionStringDelegate(ConnectionStringProxy), new object[] { text });
             }
             else
             {
@@ -111,7 +112,7 @@ namespace Communication.Interface.UI
         {
             if (this.InvokeRequired)
             {
-                this.Invoke(new ClearDelegate(ClearProxy), null);
+                this.BeginInvoke(new ClearDelegate(ClearProxy), null);
             }
             else
             {
@@ -169,6 +170,7 @@ namespace Communication.Interface.UI
             ConsoleText.AppendText(text.Replace("\r\r\n", "\r\n"));
             ConsoleText.ScrollToCaret();
         }
+
         public void Clear()
         {
             ConsoleText.Clear();

@@ -5,9 +5,6 @@ namespace Communication.Interface.Interop
 {
     public class Win32Interop
     {
-        public static int SW_HIDE = 0;
-        public static int SW_SHOW = 5;
-
         [DllImport("User32.dll", EntryPoint = "FindWindow")]
         public static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
         [DllImport("User32.dll", EntryPoint = "FindWindowEx")]
@@ -44,6 +41,9 @@ namespace Communication.Interface.Interop
         [DllImport("user32.dll", SetLastError = true)]
         public static extern uint GetWindowThreadProcessId(IntPtr hWnd, out int lpdwProcessId);
 
+        public static int SW_HIDE = 0;
+        public static int SW_SHOW = 5;
+
         public static void ShowConsoleWindow()
         {
             var handle = GetConsoleWindow();
@@ -75,6 +75,16 @@ namespace Communication.Interface.Interop
             public bool IsSame(Rect Reference)
             {
                 return this.Left == Reference.Left && this.Right == Reference.Right && this.Top == Reference.Top && this.Bottom == Reference.Bottom;
+            }
+
+            public static Rect Zero()
+            {
+                Rect zero;
+                zero.Left = 0;
+                zero.Top = 0;
+                zero.Right = 0;
+                zero.Bottom = 0;
+                return zero;
             }
         }
     }
