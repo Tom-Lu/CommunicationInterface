@@ -223,7 +223,6 @@ namespace Communication.Interface
                 Viewer.Release();
                 Viewer = null;
             }
-        }
-    
+        } 
     }
 }

@@ -427,6 +427,7 @@ namespace Communication.Interface.UI
                 ArrayList TabNameList = new ArrayList();
                 ArrayList TabNameSortedList = new ArrayList();
                 TabPage[] TabPages = new TabPage[ConsoleHost.TabPages.Count];
+                TabPage SelectedPage = ConsoleHost.SelectedTab;
 
                 foreach (TabPage Page in ConsoleHost.TabPages)
                 {
@@ -443,6 +444,7 @@ namespace Communication.Interface.UI
 
                 ConsoleHost.TabPages.Clear();
                 ConsoleHost.TabPages.AddRange(TabPages);
+                ConsoleHost.SelectedIndex = ConsoleHost.TabPages.IndexOf(SelectedPage);
             }
         }
 
