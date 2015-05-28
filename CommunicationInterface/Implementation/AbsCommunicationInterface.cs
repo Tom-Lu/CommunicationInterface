@@ -29,8 +29,9 @@ namespace Communication.Interface.Implementation
             Timeout = 10;
             StopToken = string.Empty;
             LineFeed = DEFAULT_LINE_FEED;
+            WriteReadInterval = 0.1;
+            WriteEcho = false;
         }
-
 
         /// <summary>
         /// Constructor using configuration string
@@ -72,6 +73,8 @@ namespace Communication.Interface.Implementation
         public string StopToken { get; set; }
         public string LineFeed { get; set; }
         abstract public bool IsOpened { get; }
+        public bool WriteEcho { get; set; }
+        public double WriteReadInterval { get; set; }
 
         public string FriendlyName { get { return friendly_name; } }
         public string ConfigString { get { return config_string; } }
@@ -224,8 +227,7 @@ namespace Communication.Interface.Implementation
             last_read_buffer.Append(ReadAll());    // Read All Previous Content
 
             Write(command);
-            Thread.Sleep(100);
-
+            Thread.Sleep((int)(WriteReadInterval * 1000));
             Status = WaitForString(StopToken, Timeout);
 
             last_read_buffer.Append(read_buffer.ToString());

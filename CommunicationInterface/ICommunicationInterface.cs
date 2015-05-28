@@ -26,12 +26,22 @@ namespace Communication.Interface
         string StopToken { get; set; }
 
         /// <summary>
+        /// Echo write content in communication viewr window
+        /// </summary>
+        bool WriteEcho { get; set; }
+
+        /// <summary>
+        /// Internal delay(seconds) between write and read operation
+        /// </summary>
+        double WriteReadInterval { get; set; }
+
+        /// <summary>
         /// Characters for write line operation
         /// </summary>
         string LineFeed { get; set; }
 
         /// <summary>
-        /// Default timeout for all read operation when timeout is not specified
+        /// Default timeout(seconds) for all read operation when timeout is not specified
         /// </summary>
         double Timeout { get; set; }
 

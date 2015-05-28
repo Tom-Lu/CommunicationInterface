@@ -68,6 +68,7 @@ namespace Communication.Interface.UI
         {
             this.CommunicationInterface = CommunicationInterface;
             this.CommunicationInterface.BufferUpdatedHandler += new OnBufferUpdatedEvent(CommInterface_OnBufferUpdatedHandler);
+            this.CommunicationInterface.WriteEventHandler += new OnWriteEvent(CommInterface_WriteEventHandler);
             this.ConnectionString.Text = this.CommunicationInterface.ConfigString;
         }
 
@@ -75,6 +76,7 @@ namespace Communication.Interface.UI
         {
             this.CommunicationInterface = CommunicationInterface;
             this.CommunicationInterface.BufferUpdatedHandler += new OnBufferUpdatedEvent(CommInterface_OnBufferUpdatedHandler);
+            this.CommunicationInterface.WriteEventHandler += new OnWriteEvent(CommInterface_WriteEventHandler);
 
             ConnectionStringProxy(this.CommunicationInterface.ConfigString);
 
@@ -91,7 +93,10 @@ namespace Communication.Interface.UI
 
         void CommInterface_WriteEventHandler(string Buffer)
         {
-            AppendTextEventProxy(Buffer, Color.CadetBlue);
+            if (CommunicationInterface.WriteEcho)
+            {
+                AppendTextEventProxy(Buffer, Color.CadetBlue);
+            }
         }
 
         delegate void ConnectionStringDelegate(string text);
