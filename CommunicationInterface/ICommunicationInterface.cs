@@ -36,6 +36,11 @@ namespace Communication.Interface
         double WriteReadInterval { get; set; }
 
         /// <summary>
+        /// Internal delay(seconds) between WriteRead loop
+        /// </summary>
+        double WriteReadLoopInterval { get; set; }
+
+        /// <summary>
         /// Characters for write line operation
         /// </summary>
         string LineFeed { get; set; }

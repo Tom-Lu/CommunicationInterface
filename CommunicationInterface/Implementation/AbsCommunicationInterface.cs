@@ -30,6 +30,7 @@ namespace Communication.Interface.Implementation
             StopToken = string.Empty;
             LineFeed = DEFAULT_LINE_FEED;
             WriteReadInterval = 0.1;
+            WriteReadLoopInterval = 0.5;
             WriteEcho = false;
         }
 
@@ -75,6 +76,7 @@ namespace Communication.Interface.Implementation
         abstract public bool IsOpened { get; }
         public bool WriteEcho { get; set; }
         public double WriteReadInterval { get; set; }
+        public double WriteReadLoopInterval { get; set; }
 
         public string FriendlyName { get { return friendly_name; } }
         public string ConfigString { get { return config_string; } }
@@ -245,6 +247,7 @@ namespace Communication.Interface.Implementation
             {
                 WriteWaitToken(Command);
                 last_read_buffer.Append(read_buffer.ToString());
+                Thread.Sleep((int)(WriteReadLoopInterval * 1000));
             } while (!last_read_buffer.ToString().Contains(Pattern) && ((DateTime.Now - start_time).TotalSeconds < Timeout));
 
             ((IBufferInternal)read_buffer).Copy(last_read_buffer);
