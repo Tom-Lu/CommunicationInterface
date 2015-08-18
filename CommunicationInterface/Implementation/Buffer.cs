@@ -98,7 +98,7 @@ namespace Communication.Interface.Implementation
 
             if (buffer_data != null)
             {
-                return Encoding.Default.GetString(GetBytes());
+                return Encoding.Default.GetString(buffer_data);
             }
 
             return string.Empty;

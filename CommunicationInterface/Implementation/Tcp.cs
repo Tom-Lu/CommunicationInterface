@@ -99,5 +99,4 @@ namespace Communication.Interface.Implementation
             }
         }
     }
-
 }

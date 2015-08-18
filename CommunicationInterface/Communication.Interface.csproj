@@ -140,6 +140,7 @@
     <Content Include="plink.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="Images\icon_script.ico" />
     <None Include="Images\Transparent.png" />
     <None Include="Images\Bring_To_Front.png" />
     <Content Include="Images\Clear.png" />

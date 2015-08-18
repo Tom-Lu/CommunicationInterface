@@ -106,7 +106,5 @@ namespace Communication.Interface.Implementation
                 stream.Write(data, 0, data.Length);
             }
         }
-
-    
     }
 }

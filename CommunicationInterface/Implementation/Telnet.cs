@@ -267,5 +267,4 @@ namespace Communication.Interface.Implementation
         }
 
     }
-
 }
