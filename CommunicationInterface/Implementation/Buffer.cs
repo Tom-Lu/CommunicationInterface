@@ -114,6 +114,11 @@ namespace Communication.Interface.Implementation
             return !Contains(Lookup);
         }
 
+        public bool EndsWith(string Lookup)
+        {
+            return ToString().EndsWith(Lookup);
+        }
+
         public bool ReadString(string Lookup, out string OutputString)
         {
             bool status = false;

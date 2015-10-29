@@ -36,6 +36,13 @@ namespace Communication.Interface
         bool DoesNotContain(string Lookup);
 
         /// <summary>
+        ///  Check if buffer ends with lookup string
+        /// </summary>
+        /// <param name="Lookup">lookup string</param>
+        /// <returns>return true if buffer ends with lookup string, otherwise return false</returns>
+        bool EndsWith(string Lookup);
+
+        /// <summary>
         /// Read string from buffer based on specified lookup string
         /// Example:
         ///           Buffer Content - software version: 1.0.1
