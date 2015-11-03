@@ -12,14 +12,14 @@ namespace Communication.Interface.Implementation
     [InterfaceImplementation(Name = "SSH", Scheme = "Ssh", ConfigPanel = typeof(Panel.SshPanel))]
     public class Ssh : AbsCommunicationInterface
     {
-        private static string PLINK_PATH = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "plink.exe");
+        private static string PLINK_PATH = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "plink_mod.exe");
         private ProcessStartInfo Plink;
         private Process PlinkProcess;
         private StreamWriter InputStream;
         private StreamReader OutputStream;
         private Queue<byte> OutputBuffer;
         private object OutputBufferLocker = new Object();
-        private const int AsyncReadBufferLength = 0x1000;
+        private const int AsyncReadBufferLength = 0x4000;
         private byte[] AsyncReadBuffer;
 
         public Ssh(string IpAddress, int Port) : base()
@@ -32,8 +32,8 @@ namespace Communication.Interface.Implementation
                 RedirectStandardError = true,
                 RedirectStandardOutput = true,
                 RedirectStandardInput = true,
-                WindowStyle = ProcessWindowStyle.Hidden,
-                CreateNoWindow = false
+                WindowStyle = ProcessWindowStyle.Hidden | ProcessWindowStyle.Minimized,
+                CreateNoWindow = true
             };
             Plink.Arguments = String.Format("-P {0} {1}", Port, IpAddress);
 
@@ -55,8 +55,8 @@ namespace Communication.Interface.Implementation
                 RedirectStandardError = true,
                 RedirectStandardOutput = true,
                 RedirectStandardInput = true,
-                WindowStyle = ProcessWindowStyle.Hidden,
-                CreateNoWindow = false
+                WindowStyle = ProcessWindowStyle.Hidden | ProcessWindowStyle.Minimized,
+                CreateNoWindow = true
             };
 
             if (Config.ContainsKey("Key"))
@@ -68,7 +68,7 @@ namespace Communication.Interface.Implementation
                 Plink.Arguments = String.Format(" -l {0} -pw {1}", Config["Username"], Config["Password"]);
             }
 
-            Plink.Arguments += String.Format(" -P {0} {1}", int.Parse(Config["Port"]), Config["IP"]);
+            Plink.Arguments += String.Format(" -P {0} {1} -ssh -batch -auto_store_sshkey", int.Parse(Config["Port"]), Config["IP"]);
         }
 
         override public bool IsOpened
@@ -102,6 +102,14 @@ namespace Communication.Interface.Implementation
         {
             if (IsOpened)
             {
+                if (InputStream != null)
+                {
+                    InputStream.BaseStream.Close();
+                }
+                if (OutputStream != null)
+                {
+                    OutputStream.BaseStream.Close();
+                }
                 PlinkProcess.Kill();
             }
         }

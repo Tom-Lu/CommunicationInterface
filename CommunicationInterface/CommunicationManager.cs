@@ -220,6 +220,7 @@ namespace Communication.Interface
         {
             if (Viewer != null)
             {
+                Viewer.HideViewer();
                 Viewer.Release();
                 Viewer = null;
             }

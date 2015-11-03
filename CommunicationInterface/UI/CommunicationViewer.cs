@@ -222,13 +222,16 @@ namespace Communication.Interface.UI
         {
             if (MainHwnd != IntPtr.Zero && DockPos != DockType.None)
             {
-                if (this.Visible)
+                if (WindowPosUpdateTimer != null)
                 {
-                    WindowPosUpdateTimer.Change(0, 300);
-                }
-                else
-                {
-                    WindowPosUpdateTimer.Change(Timeout.Infinite, 300);
+                    if (this.Visible)
+                    {
+                        WindowPosUpdateTimer.Change(0, 300);
+                    }
+                    else
+                    {
+                        WindowPosUpdateTimer.Change(Timeout.Infinite, 300);
+                    }
                 }
             }
         }
