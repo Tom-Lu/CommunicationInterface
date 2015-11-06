@@ -57,6 +57,11 @@ namespace Communication.Interface.UI
             this.VisibleChanged += new EventHandler(Viewer_VisibleChanged);
         }
 
+        ~CommunicationViewer()
+        {
+            Release();
+        }
+
         public void Release()
         {
             if (WindowPosUpdateTimer != null)
@@ -79,7 +84,6 @@ namespace Communication.Interface.UI
             {
                 if (!this.Visible)
                 {
-                    // Show();
                     ViewerThread = new Thread(new ParameterizedThreadStart(delegate(object obj)
                         {
                             ShowDialog();
@@ -126,6 +130,7 @@ namespace Communication.Interface.UI
                 {
                     Close();
                     Dispose();
+                    ViewerThread.Join();
                 }
             }
         }
