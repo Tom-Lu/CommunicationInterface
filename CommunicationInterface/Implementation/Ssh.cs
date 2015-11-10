@@ -105,10 +105,12 @@ namespace Communication.Interface.Implementation
                 if (InputStream != null)
                 {
                     InputStream.BaseStream.Close();
+                    InputStream = null;
                 }
                 if (OutputStream != null)
                 {
                     OutputStream.BaseStream.Close();
+                    OutputStream = null;
                 }
                 PlinkProcess.Kill();
             }

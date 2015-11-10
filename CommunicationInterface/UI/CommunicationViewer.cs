@@ -89,6 +89,7 @@ namespace Communication.Interface.UI
                             ShowDialog();
                         }));
                     ViewerThread.Start();
+                    Thread.Sleep(1000);
                 }
                 else
                 {
@@ -394,6 +395,21 @@ namespace Communication.Interface.UI
                 TabPage IndicatorPage = IndicatorDictionary[CommunicationInterface];
                 RemoveIndicatorPage(IndicatorPage );
                 IndicatorDictionary.Remove(CommunicationInterface);
+            }
+            RefreshGui();
+        }
+
+        delegate void RefreshGuiDelegate();
+        public void RefreshGui()
+        {
+            if (this.InvokeRequired)
+            {
+                this.BeginInvoke(new RefreshGuiDelegate(RefreshGui), null);
+            }
+            else
+            {
+                Refresh();
+                Application.DoEvents();
             }
         }
 

@@ -60,8 +60,9 @@ namespace Communication.Interface.Implementation
         {
             if (tcp_client != null)
             {
-                tcp_client.Close();
+                stream.Close();
                 stream = null;
+                tcp_client.Close();
             }
         }
 

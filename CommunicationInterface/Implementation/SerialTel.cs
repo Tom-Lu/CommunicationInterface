@@ -89,9 +89,15 @@ namespace Communication.Interface.Implementation
                 }
 
             } while (data != -1);
-            global_buffer.Append((IBufferInternal)read_buffer);
+
             if (!read_buffer.IsEmpty())
             {
+                global_buffer.Append((IBufferInternal)read_buffer);
+                if (FragmentBufferRecord)
+                {
+                    fragment_buffer.Append((IBufferInternal)read_buffer);
+                }
+
                 TriggerBufferUpdateEvent(read_buffer);
             }
             return read_buffer.ToString();

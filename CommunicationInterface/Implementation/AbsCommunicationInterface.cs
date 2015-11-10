@@ -11,10 +11,14 @@ namespace Communication.Interface.Implementation
     {
         protected string DEFAULT_LINE_FEED = "\r\n";
         public static readonly int DefaultGlobalBufferSize = 40960;
+        public static readonly int DefaultFragmentBufferSize = 4096;
         public static readonly int DefaultReadBufferSize = 4096;
 
         internal IBufferInternal global_buffer = null;
+        internal IBufferInternal fragment_buffer = null;
         internal IBufferInternal read_buffer = null;
+
+        internal bool FragmentBufferRecord = false;
         private string config_string = string.Empty;
         protected string friendly_name = string.Empty;
         protected Dictionary<string, string> Config = null;
@@ -25,6 +29,7 @@ namespace Communication.Interface.Implementation
         internal AbsCommunicationInterface()
         {
             global_buffer = new Buffer(DefaultGlobalBufferSize);
+            fragment_buffer = new Buffer(DefaultFragmentBufferSize);
             read_buffer = new Buffer(DefaultReadBufferSize);
             Timeout = 10;
             StopToken = string.Empty;
@@ -69,6 +74,8 @@ namespace Communication.Interface.Implementation
                 read_buffer = null;
                 read_buffer = new Buffer(int.Parse(Config["ReadBuffer"]));
             }
+
+            fragment_buffer = new Buffer(DefaultFragmentBufferSize);
         }
 
         public string StopToken { get; set; }
@@ -81,6 +88,7 @@ namespace Communication.Interface.Implementation
         public string FriendlyName { get { return friendly_name; } }
         public string ConfigString { get { return config_string; } }
         public IBuffer ReadBuffer { get { return (IBuffer)read_buffer; } }
+        public IBuffer FragmentBuffer { get { return (IBuffer)fragment_buffer; } }
         public IBuffer GlobalBuffer { get { return (IBuffer)global_buffer; } }
 
         public double Timeout { get; set; }
@@ -142,9 +150,14 @@ namespace Communication.Interface.Implementation
                 }
             } while (data != -1);
 
-            global_buffer.Append((IBufferInternal)read_buffer);
             if (!read_buffer.IsEmpty())
             {
+                global_buffer.Append((IBufferInternal)read_buffer);
+                if (FragmentBufferRecord)
+                {
+                    fragment_buffer.Append((IBufferInternal)read_buffer);
+                }
+
                 TriggerBufferUpdateEvent(read_buffer);
             }
             return read_buffer.ToString();
@@ -262,6 +275,18 @@ namespace Communication.Interface.Implementation
         public bool WriteLineWaitTokenUntil(string Command, string Pattern, double Timeout)
         {
             return WriteWaitTokenUntil(Command + LineFeed, Pattern, Timeout);
+        }
+
+        public void StartFragmentBufferRecord()
+        {
+            FragmentBufferRecord = true;
+            FragmentBuffer.Clear();
+        }
+
+        public IBuffer StopFragmentBufferRecord()
+        {
+            FragmentBufferRecord = false;
+            return FragmentBuffer;
         }
 
         protected void TriggerBufferUpdateEvent(IBufferInternal ReadBuffer)

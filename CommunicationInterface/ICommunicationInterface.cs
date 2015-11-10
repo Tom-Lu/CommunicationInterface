@@ -66,6 +66,11 @@ namespace Communication.Interface
         IBuffer ReadBuffer { get; }
 
         /// <summary>
+        /// Buffer for fragment communcition content controlable through StartFragmentBufferRecord and StopFragmentBufferRecord method
+        /// </summary>
+        IBuffer FragmentBuffer { get; }
+
+        /// <summary>
         /// Buffer for global read operation, contains all read content since interface opened
         /// </summary>
         IBuffer GlobalBuffer { get; }
@@ -204,5 +209,17 @@ namespace Communication.Interface
         /// <param name="Timeout">read operation will stop when specific timeout reached</param>
         /// <returns>Indicate if quite is reached or not</returns>
         bool WaitForQuiet(double QuietTime, double Timeout);
+
+        /// <summary>
+        /// Start reacord communication content into fragment buffer, previous content will be cleared.
+        /// </summary>
+        void StartFragmentBufferRecord();
+
+        /// <summary>
+        /// Stop reacord communication content into fragment buffer
+        /// </summary>
+        /// <returns>Return the fragment buffer object</returns>
+        IBuffer StopFragmentBufferRecord();
+
     }
 }

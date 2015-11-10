@@ -69,6 +69,8 @@ namespace Communication.Interface.Implementation
         {
             if (port != null)
             {
+                stream.Close();
+                stream = null;
                 port.Close();
             }
         }
