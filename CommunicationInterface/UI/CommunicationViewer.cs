@@ -61,13 +61,26 @@ namespace Communication.Interface.UI
 
         public CommunicationViewer AddDisplayFilter(string Source, string Target)
         {
-            DisplayFilterDictionary.Add(Source, Target);
+            if(DisplayFilterDictionary != null)
+            {
+                if (DisplayFilterDictionary.ContainsKey(Source))
+                {
+                    DisplayFilterDictionary[Source] = Target;
+                }
+                else
+                {
+                    DisplayFilterDictionary.Add(Source, Target);
+                }
+            }
             return this;
         }
 
         public void ClearDisplayFilter()
         {
-            DisplayFilterDictionary.Clear();
+            if (DisplayFilterDictionary != null)
+            {
+                DisplayFilterDictionary.Clear();
+            }
         }
 
         ~CommunicationViewer()
