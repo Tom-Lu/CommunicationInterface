@@ -50,6 +50,8 @@ namespace Communication.Interface.UI
             }
         }
 
+        public Dictionary<string, string> Filter { get; set; }
+
         public void PostMessage(object sender, string Message)
         {
             AppendTextEventProxy(Message, Color.White);
@@ -152,28 +154,45 @@ namespace Communication.Interface.UI
         }
         public void AppendLine(string text)
         {
-            ConsoleText.AppendText(text + "\r\n");
+            ConsoleText.AppendText(FilterText(text) + System.Environment.NewLine);
             ConsoleText.ScrollToCaret();
         }
         public void Append(string text)
         {
-            ConsoleText.AppendText(text.Replace("\r\r\n", "\r\n"));
+            ConsoleText.AppendText(FilterText(text));
             ConsoleText.ScrollToCaret();
         }
         public void Append(string text, Color textColor)
         {
-            ConsoleText.AppendText(text.Replace("\r\r\n", "\r\n"));
+            ConsoleText.AppendText(FilterText(text));
             ConsoleText.ScrollToCaret();
         }
         public void Append(string text, Font font)
         {
-            ConsoleText.AppendText(text.Replace("\r\r\n", "\r\n"));
+            ConsoleText.AppendText(FilterText(text));
             ConsoleText.ScrollToCaret();
         }
         public void Append(string text, Color textColor, Font font)
         {
-            ConsoleText.AppendText(text.Replace("\r\r\n", "\r\n"));
+            ConsoleText.AppendText(FilterText(text));
             ConsoleText.ScrollToCaret();
+        }
+
+        private string FilterText(string text)
+        {
+            if (Filter == null)
+            {
+                return text;
+            }
+            else
+            {
+                string filtered_text = text;
+                foreach (KeyValuePair<string, string> filterItem in Filter)
+                {
+                    filtered_text = filtered_text.Replace(filterItem.Key, filterItem.Value);
+                }
+                return filtered_text;
+            }
         }
 
         public void Clear()

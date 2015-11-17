@@ -150,7 +150,7 @@ namespace Communication.Interface.Implementation
         {
             if (InputStream.BaseStream.CanWrite)
             {
-                InputStream.Write(Encoding.Default.GetString(data, 0, data.Length));
+                InputStream.Write(Encoding.ASCII.GetString(data, 0, data.Length));
             }
         }
 
@@ -161,15 +161,18 @@ namespace Communication.Interface.Implementation
 
         private void OutputStreamReadCallback(IAsyncResult result)
         {
-            int ReadLenght = OutputStream.BaseStream.EndRead(result);
-            if (ReadLenght > 0)
+            if (OutputStream != null)
             {
-                OutputBufferEnqueue(ReadLenght);
-                BeginOutputStreamRead();
-            }
-            else if (ReadLenght < 0)
-            {
-                BeginOutputStreamRead();
+                int ReadLenght = OutputStream.BaseStream.EndRead(result);
+                if (ReadLenght > 0)
+                {
+                    OutputBufferEnqueue(ReadLenght);
+                    BeginOutputStreamRead();
+                }
+                else if (ReadLenght < 0)
+                {
+                    BeginOutputStreamRead();
+                }
             }
         }
 

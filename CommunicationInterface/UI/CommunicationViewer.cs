@@ -24,6 +24,7 @@ namespace Communication.Interface.UI
         private System.Threading.Thread ViewerThread = null;
         private System.Threading.Timer WindowPosUpdateTimer = null;
         private Dictionary<ICommunicationInterface, TabPage> IndicatorDictionary = null;
+        private Dictionary<string, string> DisplayFilterDictionary = null;
         private Win32Interop.Rect LastPos;
 
         public CommunicationViewer() : this(DockType.None)
@@ -37,6 +38,7 @@ namespace Communication.Interface.UI
             InitializeComponent();
 
             IndicatorDictionary = new Dictionary<ICommunicationInterface, TabPage>();
+            DisplayFilterDictionary = new Dictionary<string, string>();
             toolStripTopMostBtn.Checked = false;
             this.TopMost = false;
 
@@ -55,6 +57,17 @@ namespace Communication.Interface.UI
             SetDockType(Dock);
 
             this.VisibleChanged += new EventHandler(Viewer_VisibleChanged);
+        }
+
+        public CommunicationViewer AddDisplayFilter(string Source, string Target)
+        {
+            DisplayFilterDictionary.Add(Source, Target);
+            return this;
+        }
+
+        public void ClearDisplayFilter()
+        {
+            DisplayFilterDictionary.Clear();
         }
 
         ~CommunicationViewer()
@@ -369,6 +382,7 @@ namespace Communication.Interface.UI
                 {
                     TabPage IndicatorPage = new TabPage(CommunicationInterface.FriendlyName);
                     CommunicationIndicator Indicator = new CommunicationIndicator(CommunicationInterface);
+                    Indicator.Filter = DisplayFilterDictionary;
                     Indicator.Dock = DockStyle.Fill;
                     IndicatorPage.Controls.Add(Indicator);
 

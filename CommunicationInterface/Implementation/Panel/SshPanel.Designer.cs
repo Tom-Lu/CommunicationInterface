@@ -104,7 +104,7 @@
             this.SshPort.Name = "SshPort";
             this.SshPort.Size = new System.Drawing.Size(257, 21);
             this.SshPort.TabIndex = 23;
-            this.SshPort.Text = "23";
+            this.SshPort.Text = "22";
             this.SshPort.TextChanged += new System.EventHandler(this.ConfigChange);
             // 
             // label9

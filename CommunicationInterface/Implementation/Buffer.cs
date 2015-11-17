@@ -74,7 +74,7 @@ namespace Communication.Interface.Implementation
 
         public void Copy(StringBuilder source)
         {
-            byte[] source_array = Encoding.Default.GetBytes(source.ToString());
+            byte[] source_array = Encoding.ASCII.GetBytes(source.ToString());
             if (source_array.Length > buffer.Length)
             {
                 buffer = new byte[source_array.Length];
@@ -98,7 +98,7 @@ namespace Communication.Interface.Implementation
 
             if (buffer_data != null)
             {
-                return Encoding.Default.GetString(buffer_data);
+                return Encoding.ASCII.GetString(buffer_data);
             }
 
             return string.Empty;

@@ -205,7 +205,7 @@ namespace Communication.Interface.Implementation
 
         public void Write(string command)
         {
-            Write(System.Text.Encoding.ASCII.GetBytes(command));
+            Write(Encoding.ASCII.GetBytes(command));
             TriggerWriteEvent(command);
         }
 
