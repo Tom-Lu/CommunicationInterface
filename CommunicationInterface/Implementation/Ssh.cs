@@ -150,7 +150,18 @@ namespace Communication.Interface.Implementation
         {
             if (InputStream.BaseStream.CanWrite)
             {
-                InputStream.Write(Encoding.ASCII.GetString(data, 0, data.Length));
+                if (ByteWriteMode)
+                {
+                    foreach (byte dataByte in data)
+                    {
+                        Thread.Sleep((int)(ByteWriteInterval * 1000));
+                        InputStream.BaseStream.WriteByte(dataByte);
+                    }
+                }
+                else
+                {
+                    InputStream.Write(Encoding.ASCII.GetString(data, 0, data.Length));
+                }
             }
         }
 

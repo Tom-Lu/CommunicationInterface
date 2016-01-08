@@ -6,6 +6,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.IO;
 using Communication.Interface;
+using System.Threading;
 
 namespace Communication.Interface.Implementation
 {
@@ -96,7 +97,18 @@ namespace Communication.Interface.Implementation
         {
             if (stream.CanWrite)
             {
-                stream.Write(data, 0, data.Length);
+                if (ByteWriteMode)
+                {
+                    foreach (byte dataByte in data)
+                    {
+                        Thread.Sleep((int)(ByteWriteInterval * 1000));
+                        stream.WriteByte(dataByte);
+                    }
+                }
+                else
+                {
+                    stream.Write(data, 0, data.Length);
+                }
             }
         }
 

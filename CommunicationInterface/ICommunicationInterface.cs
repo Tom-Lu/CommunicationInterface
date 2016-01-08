@@ -26,6 +26,16 @@ namespace Communication.Interface
         string StopToken { get; set; }
 
         /// <summary>
+        /// Write Byte by Byte when this field set to True, usual you can specify delay between each byte by set ByteWriteInterval
+        /// </summary>
+        bool ByteWriteMode { get; set; }
+
+        /// <summary>
+        /// Internal delay(seconds) between write each byte when ByteWriteMode set to true
+        /// </summary>
+        double ByteWriteInterval { get; set; }
+
+        /// <summary>
         /// Echo write content in communication viewr window
         /// </summary>
         bool WriteEcho { get; set; }

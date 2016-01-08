@@ -105,7 +105,18 @@ namespace Communication.Interface.Implementation
         {
             if (stream.CanWrite)
             {
-                stream.Write(data, 0, data.Length);
+                if (ByteWriteMode)
+                {
+                    foreach (byte dataByte in data)
+                    {
+                        Thread.Sleep((int)(ByteWriteInterval * 1000));
+                        stream.WriteByte(dataByte);
+                    }
+                }
+                else
+                {
+                    stream.Write(data, 0, data.Length);
+                }
             }
         }
     }

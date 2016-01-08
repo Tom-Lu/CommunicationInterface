@@ -37,6 +37,8 @@ namespace Communication.Interface.Implementation
             WriteReadInterval = 0.1;
             WriteReadLoopInterval = 0.5;
             WriteEcho = false;
+            ByteWriteMode = false;
+            ByteWriteInterval = 0.01;
         }
 
         /// <summary>
@@ -81,6 +83,8 @@ namespace Communication.Interface.Implementation
         public string StopToken { get; set; }
         public string LineFeed { get; set; }
         abstract public bool IsOpened { get; }
+        public bool ByteWriteMode { get; set; }
+        public double ByteWriteInterval { get; set; }
         public bool WriteEcho { get; set; }
         public double WriteReadInterval { get; set; }
         public double WriteReadLoopInterval { get; set; }
