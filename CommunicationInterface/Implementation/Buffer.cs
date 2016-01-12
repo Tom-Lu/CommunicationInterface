@@ -16,9 +16,12 @@ namespace Communication.Interface.Implementation
         internal Buffer(int Capacity)
         {
             buffer = new byte[Capacity];
+            RegexMatchOption = RegexOptions.Multiline;
         }
 
         #region IBufferInternal
+
+        public RegexOptions RegexMatchOption { get; set; }
 
         public bool IsEmpty()
         {
@@ -202,7 +205,7 @@ namespace Communication.Interface.Implementation
             OutputString = string.Empty;
             string buffer_content = ToString();
 
-            Match RegMatch = Regex.Match(buffer_content, Pattern, RegexOptions.Multiline);
+            Match RegMatch = Regex.Match(buffer_content, Pattern, RegexMatchOption);
             if (RegMatch.Success)
             {
                 Group MatchGroup = RegMatch.Groups[GroupName];

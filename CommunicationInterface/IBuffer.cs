@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Communication.Interface
 {
@@ -10,6 +11,11 @@ namespace Communication.Interface
     /// </summary>
     public interface IBuffer
     {
+        /// <summary>
+        /// RegexOptions for all Regular Expressions read function
+        /// </summary>
+        RegexOptions RegexMatchOption { get; set; }
+
         /// <summary>
         /// Clear all buffer content
         /// </summary>
