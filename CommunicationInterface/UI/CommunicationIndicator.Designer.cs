@@ -58,7 +58,7 @@
             this.PanelLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 23F));
             this.PanelLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.PanelLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.PanelLayout.Size = new System.Drawing.Size(393, 99);
+            this.PanelLayout.Size = new System.Drawing.Size(395, 141);
             this.PanelLayout.TabIndex = 0;
             // 
             // ConsoleText
@@ -76,7 +76,7 @@
             this.ConsoleText.Name = "ConsoleText";
             this.ConsoleText.ReadOnly = true;
             this.ConsoleText.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.ConsoleText.Size = new System.Drawing.Size(393, 56);
+            this.ConsoleText.Size = new System.Drawing.Size(395, 98);
             this.ConsoleText.TabIndex = 1;
             this.ConsoleText.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.ConsoleText_KeyPress);
             // 
@@ -85,9 +85,9 @@
             this.ConsoleStatus.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ConsoleStatus.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.ConnectionString});
-            this.ConsoleStatus.Location = new System.Drawing.Point(0, 79);
+            this.ConsoleStatus.Location = new System.Drawing.Point(0, 121);
             this.ConsoleStatus.Name = "ConsoleStatus";
-            this.ConsoleStatus.Size = new System.Drawing.Size(393, 20);
+            this.ConsoleStatus.Size = new System.Drawing.Size(395, 20);
             this.ConsoleStatus.TabIndex = 2;
             this.ConsoleStatus.Text = "statusStrip1";
             this.ConsoleStatus.Click += new System.EventHandler(this.ConsoleStatus_Click);
@@ -109,7 +109,7 @@
             this.InputControlBtn});
             this.ConsoleToolStrip.Location = new System.Drawing.Point(0, 0);
             this.ConsoleToolStrip.Name = "ConsoleToolStrip";
-            this.ConsoleToolStrip.Size = new System.Drawing.Size(393, 23);
+            this.ConsoleToolStrip.Size = new System.Drawing.Size(395, 23);
             this.ConsoleToolStrip.TabIndex = 3;
             this.ConsoleToolStrip.Text = "toolStrip1";
             // 
@@ -158,7 +158,7 @@
             this.Controls.Add(this.PanelLayout);
             this.Margin = new System.Windows.Forms.Padding(0);
             this.Name = "CommunicationIndicator";
-            this.Size = new System.Drawing.Size(393, 99);
+            this.Size = new System.Drawing.Size(395, 141);
             this.PanelLayout.ResumeLayout(false);
             this.PanelLayout.PerformLayout();
             this.ConsoleStatus.ResumeLayout(false);

@@ -11,79 +11,68 @@ namespace Communication.Interface.Implementation
     public class Buffer : IBufferInternal, IBuffer
     {
         private const string line_splitter = "\r\n";
+        private MemoryStream buffer_stream = null;
         private byte[] buffer = null;
         private long index = 0;
         internal Buffer(int Capacity)
         {
+            buffer_stream = new MemoryStream(Capacity);
             buffer = new byte[Capacity];
             RegexMatchOption = RegexOptions.Multiline;
         }
 
         #region IBufferInternal
 
+        public Stream BufferStream
+        {
+            get
+            {
+                return buffer_stream;
+            }
+        }
+
         public RegexOptions RegexMatchOption { get; set; }
 
         public bool IsEmpty()
         {
-            return index == 0;
+            return buffer_stream.Length > 0;
         }
 
         public byte[] GetBytes()
         {
-            if (index > 0)
-            {
-                byte[] result_array = new byte[index];
-                Array.Copy(buffer, result_array, index);
-                return result_array;
-            }
-            return null;
+            return buffer_stream.GetBuffer();
         }
 
         public void Append(IBufferInternal source)
         {
-            byte[] source_array = source.GetBytes();
-            if (source_array != null)
+            if (source != null)
             {
-                foreach (byte data in source_array)
-                {
-                    Append(data);
-                }
+                source.BufferStream.CopyTo(buffer_stream);
             }
         }
 
         public void Append(byte data)
         {
-            if (index == buffer.Length)
-            {
-                // buffer full, increase 1k size
-                byte[] old_buffer = buffer;
-                buffer = new byte[buffer.Length + 1024];
-                Array.Copy(old_buffer, buffer, old_buffer.Length);
-                old_buffer = null;
-            }
-            buffer[index++] = data;
+            buffer_stream.WriteByte(data);
         }
 
         public void Copy(IBufferInternal source)
         {
-            byte[] source_array = source.GetBytes();
-            if (source_array.Length > buffer.Length)
+            if (source != null)
             {
-                buffer = new byte[source_array.Length];
+                buffer_stream.SetLength(0);
+                source.BufferStream.CopyTo(buffer_stream);
             }
-            Array.Copy(source_array, buffer, source_array.Length);
-            index = source_array.Length;
         }
 
         public void Copy(StringBuilder source)
         {
-            byte[] source_array = Encoding.ASCII.GetBytes(source.ToString());
-            if (source_array.Length > buffer.Length)
+            if (source != null)
             {
-                buffer = new byte[source_array.Length];
+                byte[] source_array = Encoding.ASCII.GetBytes(source.ToString());
+                buffer_stream.SetLength(0);
+                buffer_stream.Write(source_array, 0, source_array.Length);
             }
-            Array.Copy(source_array, buffer, source_array.Length);
-            index = source_array.Length;
         }
 
         #endregion
@@ -92,19 +81,12 @@ namespace Communication.Interface.Implementation
 
         public void Clear()
         {
-            index = 0;
+            buffer_stream.SetLength(0);
         }
 
         override public string ToString()
         {
-            byte[] buffer_data = GetBytes();
-
-            if (buffer_data != null)
-            {
-                return Encoding.ASCII.GetString(buffer_data);
-            }
-
-            return string.Empty;
+            return Encoding.ASCII.GetString(buffer_stream.GetBuffer());
         }
 
         public bool Contains(string Lookup)
@@ -126,12 +108,12 @@ namespace Communication.Interface.Implementation
         {
             bool status = false;
             OutputString = string.Empty;
-            string buffer_content = ToString();
+            string BufferString = ToString();
 
-            int index = buffer_content.IndexOf(Lookup);
+            int index = BufferString.IndexOf(Lookup);
             if (index != -1)
             {
-                string temp_string = buffer_content.Substring(index + Lookup.Length);
+                string temp_string = BufferString.Substring(index + Lookup.Length);
                 string[] Lines = temp_string.Split(new string[] { line_splitter }, StringSplitOptions.RemoveEmptyEntries);
                 if (Lines.Length > 0)
                 {

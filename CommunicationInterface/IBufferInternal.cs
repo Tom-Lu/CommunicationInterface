@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.IO;
 
 namespace Communication.Interface
 {
@@ -10,6 +11,9 @@ namespace Communication.Interface
     /// </summary>
     public interface IBufferInternal
     {
+
+        Stream BufferStream { get; }
+
         /// <summary>
         /// Clear all buffer content
         /// </summary>

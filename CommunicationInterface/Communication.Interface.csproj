@@ -41,6 +41,7 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Implementation\PlinkTelnet.cs" />
     <Compile Include="Implementation\Tcp.cs" />
     <Compile Include="Interop\Win32Window.cs" />
     <Compile Include="UI\CommunicationViewer.cs">

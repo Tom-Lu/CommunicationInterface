@@ -9,8 +9,8 @@ using System.Collections.Generic;
 
 namespace Communication.Interface.Implementation
 {
-    [InterfaceImplementation(Name = "SSH", Scheme = "Ssh", ConfigPanel = typeof(Panel.SshPanel))]
-    public class Ssh : AbsCommunicationInterface
+    [InterfaceImplementation(Name = "PlinkTelnet", Scheme = "PlinkTelnet", ConfigPanel = typeof(Panel.IpPortPanel))]
+    public class PlinkTelnet : AbsCommunicationInterface
     {
         private static string PLINK_PATH = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "plink_mod.exe");
         private ProcessStartInfo Plink;
@@ -22,7 +22,7 @@ namespace Communication.Interface.Implementation
         private const int AsyncReadBufferLength = 0x4000;
         private byte[] AsyncReadBuffer;
 
-        public Ssh(string IpAddress, int Port) : base()
+        public PlinkTelnet(string IpAddress, int Port) : base()
         {
             OutputBuffer = new Queue<byte>();
             Plink = new ProcessStartInfo()
@@ -35,11 +35,11 @@ namespace Communication.Interface.Implementation
                 WindowStyle = ProcessWindowStyle.Hidden | ProcessWindowStyle.Minimized,
                 CreateNoWindow = true
             };
-            Plink.Arguments = String.Format("-P {0} {1}", Port, IpAddress);
+            Plink.Arguments = String.Format(" -telnet -P {0} {1}", Port, IpAddress);
 
         }
 
-        public Ssh(string ConfigString, string FriendlyName)
+        public PlinkTelnet(string ConfigString, string FriendlyName)
             : base(ConfigString, FriendlyName)
         {
             if (FriendlyName == null || FriendlyName.Equals(string.Empty))
@@ -59,24 +59,7 @@ namespace Communication.Interface.Implementation
                 CreateNoWindow = true
             };
 
-            Plink.Arguments = string.Empty;
-
-            if (Config.ContainsKey("Key") && !Config["Key"].Equals(string.Empty))
-            {
-                Plink.Arguments += String.Format("-i {0} ", Config["Key"]);
-            }
-
-            if (Config.ContainsKey("Username") && !Config["Username"].Equals(string.Empty))
-            {
-                Plink.Arguments += String.Format("-l {0} ", Config["Username"]);
-            }
-
-            if (Config.ContainsKey("Password") && !Config["Password"].Equals(string.Empty))
-            {
-                Plink.Arguments += String.Format("-pw {0} ", Config["Password"]);
-            }
-
-            Plink.Arguments += String.Format("-P {0} {1} -ssh -batch -auto_store_sshkey", int.Parse(Config["Port"]), Config["IP"]);
+            Plink.Arguments = String.Format(" -telnet -P {0} {1}", int.Parse(Config["Port"]), Config["IP"]);
         }
 
         override public bool IsOpened

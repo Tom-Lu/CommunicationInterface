@@ -53,7 +53,7 @@
             this.ConsoleHost.Location = new System.Drawing.Point(0, 28);
             this.ConsoleHost.Name = "ConsoleHost";
             this.ConsoleHost.SelectedIndex = 0;
-            this.ConsoleHost.Size = new System.Drawing.Size(685, 294);
+            this.ConsoleHost.Size = new System.Drawing.Size(341, 121);
             this.ConsoleHost.TabIndex = 0;
             // 
             // toolStrip1
@@ -64,7 +64,7 @@
             this.toolStripTransparenceBtn});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(685, 25);
+            this.toolStrip1.Size = new System.Drawing.Size(341, 25);
             this.toolStrip1.TabIndex = 1;
             this.toolStrip1.Text = "toolStrip1";
             // 
@@ -170,7 +170,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(685, 322);
+            this.ClientSize = new System.Drawing.Size(341, 149);
             this.Controls.Add(this.toolStrip1);
             this.Controls.Add(this.ConsoleHost);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));

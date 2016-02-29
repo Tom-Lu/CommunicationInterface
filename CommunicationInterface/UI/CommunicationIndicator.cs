@@ -10,12 +10,14 @@ using System.Reflection;
 using Communication.Interface;
 using System.Threading;
 using System.Runtime.InteropServices;
+using System.IO.Pipes;
 
 namespace Communication.Interface.UI
 {
     public partial class CommunicationIndicator : UserControl
     {
         private bool _ToolbarVisible = true;
+        private NamedPipeServerStream IndicatorPipe = null;
         private ICommunicationInterface CommunicationInterface = null;
         private AppendTextEventDelegate AppendTextEventHandler = null;
         private System.Threading.Timer BackgroundReadTimer = null;
@@ -60,7 +62,6 @@ namespace Communication.Interface.UI
         public CommunicationIndicator()
         {
             InitializeComponent();
-            
             AppendTextEventHandler = new AppendTextEventDelegate(AppendTextEventProxy);
             ToolbarVisible = true;
         }
@@ -68,6 +69,9 @@ namespace Communication.Interface.UI
         public CommunicationIndicator(ICommunicationInterface CommunicationInterface)
             : this()
         {
+            //IndicatorPipe = new NamedPipeServerStream(CommunicationInterface.FriendlyName, PipeDirection.In);
+            //IndicatorPipe.ReadMode = PipeTransmissionMode.Byte;
+
             this.CommunicationInterface = CommunicationInterface;
             this.CommunicationInterface.BufferUpdatedHandler += new OnBufferUpdatedEvent(CommInterface_OnBufferUpdatedHandler);
             this.CommunicationInterface.WriteEventHandler += new OnWriteEvent(CommInterface_WriteEventHandler);

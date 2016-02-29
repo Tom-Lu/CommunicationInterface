@@ -126,6 +126,7 @@ namespace Communication.Interface.Implementation
                 previous_data2 = previous_data;
                 previous_data = data;
                 data = ReadByte();
+
                 switch (data)
                 {
                     case -1:
@@ -133,38 +134,46 @@ namespace Communication.Interface.Implementation
                     case (int)TELNET_CMD.IAC:
                         {
                             cmd = ReadByte();
+                            // File.AppendAllText("d:\\telnet.txt", string.Format("-> IAC: 0x{0:X2}\r\n", cmd));
                             if (cmd == -1) break;
 
                             switch ((TELNET_CMD)cmd)
                             {
                                 case TELNET_CMD.IAC:   // data 0xFF
                                         read_buffer.Append((byte)cmd);
+                                        // File.AppendAllText("d:\\telnet.txt", "IAC: IAC\r\n");
                                     break;
                                 case TELNET_CMD.DO:
                                     {
                                         option = ReadByte();
+                                        // File.AppendAllText("d:\\telnet.txt", string.Format("-> IAC: DO: 0x{0:X2}\r\n", option));
                                         // Refuse all request
                                         Write((byte)TELNET_CMD.IAC);
-                                        Write((byte)TELNET_CMD.WONT);
+                                        Write((byte)TELNET_CMD.DONT);
                                         Write((byte)option);
+                                        File.AppendAllText("d:\\telnet.txt", string.Format("<- IAC: DO: 0x{0:X2}\r\n", option));
                                         break;
                                     }
                                 case TELNET_CMD.DONT:
                                     {
-                                        ReadByte(); //  Yes, I hear you.
+                                        option = ReadByte(); //  Yes, I hear you.
+                                        // File.AppendAllText("d:\\telnet.txt", string.Format("-> IAC: DONT: 0x{0:X2}\r\n", option));
                                         break;
                                     }
                                 case TELNET_CMD.WILL:
                                     {
                                         option = ReadByte();
+                                        // File.AppendAllText("d:\\telnet.txt", string.Format("-> IAC: WILL: 0x{0:X2}\r\n", option));
                                         Write((byte)TELNET_CMD.IAC);
-                                        Write((byte)TELNET_CMD.DONT);
+                                        Write((byte)TELNET_CMD.WONT);
                                         Write((byte)option);
+                                        // File.AppendAllText("d:\\telnet.txt", string.Format("<- IAC: DO: 0x{0:X2}\r\n", option));
                                         break;
                                     }
                                 case TELNET_CMD.WONT:
                                     {
-                                        ReadByte(); //  Yes, I hear you.
+                                        option = ReadByte(); //  Yes, I hear you.
+                                        // File.AppendAllText("d:\\telnet.txt", string.Format("-> IAC: WONT: 0x{0:X2}\r\n", option));
                                         break;
                                     }
                                 default:
