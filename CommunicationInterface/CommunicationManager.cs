@@ -98,7 +98,7 @@ namespace Communication.Interface
         /// <returns>interface instance created by this method, null if failed</returns>
         public static ICommunicationInterface InstanceInterface(string ConnectionString, string FriendlyName)
         {
-            return InstanceInterface(ConnectionString, string.Empty, true);
+            return InstanceInterface(ConnectionString, FriendlyName, true);
         }
         
         /// <summary>

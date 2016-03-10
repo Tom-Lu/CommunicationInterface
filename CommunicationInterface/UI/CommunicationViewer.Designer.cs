@@ -53,7 +53,7 @@
             this.ConsoleHost.Location = new System.Drawing.Point(0, 28);
             this.ConsoleHost.Name = "ConsoleHost";
             this.ConsoleHost.SelectedIndex = 0;
-            this.ConsoleHost.Size = new System.Drawing.Size(341, 121);
+            this.ConsoleHost.Size = new System.Drawing.Size(457, 165);
             this.ConsoleHost.TabIndex = 0;
             // 
             // toolStrip1
@@ -64,7 +64,7 @@
             this.toolStripTransparenceBtn});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(341, 25);
+            this.toolStrip1.Size = new System.Drawing.Size(457, 25);
             this.toolStrip1.TabIndex = 1;
             this.toolStrip1.Text = "toolStrip1";
             // 
@@ -87,35 +87,35 @@
             // toolStripDockNone
             // 
             this.toolStripDockNone.Name = "toolStripDockNone";
-            this.toolStripDockNone.Size = new System.Drawing.Size(119, 22);
+            this.toolStripDockNone.Size = new System.Drawing.Size(152, 22);
             this.toolStripDockNone.Text = "None";
             this.toolStripDockNone.Click += new System.EventHandler(this.toolStripDockNone_Click);
             // 
             // toolStripDockLeft
             // 
             this.toolStripDockLeft.Name = "toolStripDockLeft";
-            this.toolStripDockLeft.Size = new System.Drawing.Size(119, 22);
+            this.toolStripDockLeft.Size = new System.Drawing.Size(152, 22);
             this.toolStripDockLeft.Text = "Left";
             this.toolStripDockLeft.Click += new System.EventHandler(this.toolStripDockLeft_Click);
             // 
             // toolStripDockTop
             // 
             this.toolStripDockTop.Name = "toolStripDockTop";
-            this.toolStripDockTop.Size = new System.Drawing.Size(119, 22);
+            this.toolStripDockTop.Size = new System.Drawing.Size(152, 22);
             this.toolStripDockTop.Text = "Top";
             this.toolStripDockTop.Click += new System.EventHandler(this.toolStripDockTop_Click);
             // 
             // toolStripDockRight
             // 
             this.toolStripDockRight.Name = "toolStripDockRight";
-            this.toolStripDockRight.Size = new System.Drawing.Size(119, 22);
+            this.toolStripDockRight.Size = new System.Drawing.Size(152, 22);
             this.toolStripDockRight.Text = "Right";
             this.toolStripDockRight.Click += new System.EventHandler(this.toolStripDockRight_Click);
             // 
             // toolStripDockBottom
             // 
             this.toolStripDockBottom.Name = "toolStripDockBottom";
-            this.toolStripDockBottom.Size = new System.Drawing.Size(119, 22);
+            this.toolStripDockBottom.Size = new System.Drawing.Size(152, 22);
             this.toolStripDockBottom.Text = "Bottom";
             this.toolStripDockBottom.Click += new System.EventHandler(this.toolStripDockBottom_Click);
             // 
@@ -148,21 +148,21 @@
             // toolStripTransparenceLow
             // 
             this.toolStripTransparenceLow.Name = "toolStripTransparenceLow";
-            this.toolStripTransparenceLow.Size = new System.Drawing.Size(117, 22);
+            this.toolStripTransparenceLow.Size = new System.Drawing.Size(152, 22);
             this.toolStripTransparenceLow.Text = "Low";
             this.toolStripTransparenceLow.Click += new System.EventHandler(this.toolStripTransparenceLow_Click);
             // 
             // toolStripTransparenceMid
             // 
             this.toolStripTransparenceMid.Name = "toolStripTransparenceMid";
-            this.toolStripTransparenceMid.Size = new System.Drawing.Size(117, 22);
+            this.toolStripTransparenceMid.Size = new System.Drawing.Size(152, 22);
             this.toolStripTransparenceMid.Text = "Middle";
             this.toolStripTransparenceMid.Click += new System.EventHandler(this.toolStripTransparenceMid_Click);
             // 
             // toolStripTransparenceHigh
             // 
             this.toolStripTransparenceHigh.Name = "toolStripTransparenceHigh";
-            this.toolStripTransparenceHigh.Size = new System.Drawing.Size(117, 22);
+            this.toolStripTransparenceHigh.Size = new System.Drawing.Size(152, 22);
             this.toolStripTransparenceHigh.Text = "High";
             this.toolStripTransparenceHigh.Click += new System.EventHandler(this.toolStripTransparenceHigh_Click);
             // 
@@ -170,12 +170,11 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(341, 149);
+            this.ClientSize = new System.Drawing.Size(457, 193);
             this.Controls.Add(this.toolStrip1);
             this.Controls.Add(this.ConsoleHost);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "CommunicationViewer";
-            this.ShowInTaskbar = false;
             this.Text = "CommViewer";
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();

@@ -59,6 +59,11 @@ namespace Communication.Interface.UI
             this.VisibleChanged += new EventHandler(Viewer_VisibleChanged);
         }
 
+        ~CommunicationViewer()
+        {
+            Release();
+        }
+
         public CommunicationViewer AddDisplayFilter(string Source, string Target)
         {
             if(DisplayFilterDictionary != null)
@@ -83,11 +88,6 @@ namespace Communication.Interface.UI
             }
         }
 
-        ~CommunicationViewer()
-        {
-            Release();
-        }
-
         public void Release()
         {
             if (WindowPosUpdateTimer != null)
@@ -97,69 +97,6 @@ namespace Communication.Interface.UI
                 WindowPosUpdateTimer = null;
             }
             ReleaseViewer();
-        }
-
-        delegate void ShowViewerDelegate();
-        public void ShowViewer()
-        {
-            if (this.InvokeRequired)
-            {
-                this.BeginInvoke(new ShowViewerDelegate(ShowViewer), null);
-            }
-            else
-            {
-                if (!this.Visible)
-                {
-                    ViewerThread = new Thread(new ParameterizedThreadStart(delegate(object obj)
-                        {
-                            ShowDialog();
-                        }));
-                    ViewerThread.Start();
-                    Thread.Sleep(1000);
-                }
-                else
-                {
-                    if (WindowState == System.Windows.Forms.FormWindowState.Minimized)
-                    {
-                        WindowState = System.Windows.Forms.FormWindowState.Normal;
-                        BringToFront();
-                    }
-                }
-            }
-        }
-
-        delegate void HideViewerDelegate();
-        public void HideViewer()
-        {
-            if (this.InvokeRequired)
-            {
-                this.BeginInvoke(new HideViewerDelegate(HideViewer), null);
-            }
-            else
-            {
-                if (Visible)
-                {
-                    Hide();
-                }
-            }
-        }
-
-        delegate void ReleaseViewerDelegate();
-        public void ReleaseViewer()
-        {
-            if (this.InvokeRequired)
-            {
-                this.BeginInvoke(new ReleaseViewerDelegate(ReleaseViewer), null);
-            }
-            else
-            {
-                if (Visible)
-                {
-                    Close();
-                    Dispose();
-                    ViewerThread.Join();
-                }
-            }
         }
 
         public void WaitForClose()
@@ -341,51 +278,6 @@ namespace Communication.Interface.UI
             return false;
         }
 
-        delegate void ViewerPosUpdateDelegate(Win32Interop.Rect WinPos);
-        public void ViewerPosUpdate(Win32Interop.Rect MainWindowPos)
-        {
-            if (this.InvokeRequired)
-            {
-                this.BeginInvoke(new ViewerPosUpdateDelegate(ViewerPosUpdate), new object[] { MainWindowPos });
-            }
-            else
-            {
-                switch (DockPos)
-                {
-                    case DockType.None:
-                        break;
-                    case DockType.Left:
-                        {
-                            this.Left = MainWindowPos.Left - this.Width;
-                            this.Top = MainWindowPos.Top;
-                            this.Height = MainWindowPos.Bottom - MainWindowPos.Top;
-                        }
-                        break;
-                    case DockType.Top:
-                        {
-                            this.Left = MainWindowPos.Left;
-                            this.Top = MainWindowPos.Top - this.Height;
-                            this.Width = MainWindowPos.Right - MainWindowPos.Left;
-                        }
-                        break;
-                    case DockType.Right:
-                        {
-                            this.Left = MainWindowPos.Right;
-                            this.Top = MainWindowPos.Top;
-                            this.Height = MainWindowPos.Bottom - MainWindowPos.Top;
-                        }
-                        break;
-                    case DockType.Bottom:
-                        {
-                            this.Left = MainWindowPos.Left;
-                            this.Top = MainWindowPos.Bottom;
-                            this.Width = MainWindowPos.Right - MainWindowPos.Left;
-                        }
-                        break;
-                }
-            }
-        }
-
         public void AttachInterface(ICommunicationInterface CommunicationInterface, bool ClearPrevious = true)
         {
             if (!IndicatorDictionary.ContainsKey(CommunicationInterface))
@@ -420,10 +312,132 @@ namespace Communication.Interface.UI
             if (IndicatorDictionary.ContainsKey(CommunicationInterface))
             {
                 TabPage IndicatorPage = IndicatorDictionary[CommunicationInterface];
-                RemoveIndicatorPage(IndicatorPage );
+                RemoveIndicatorPage(IndicatorPage);
                 IndicatorDictionary.Remove(CommunicationInterface);
             }
             RefreshGui();
+        }
+
+        private int ContainsFriendlyName(ICommunicationInterface CommunicationInterface)
+        {
+            for (int i = 0; i < IndicatorDictionary.Count; i++)
+            {
+                if (CommunicationInterface.FriendlyName.Equals(IndicatorDictionary.Keys.ToList<ICommunicationInterface>()[i].FriendlyName))
+                {
+                    return i;
+                }
+            }
+            return -1;
+        }
+
+        delegate void ViewerPosUpdateDelegate(Win32Interop.Rect WinPos);
+        public void ViewerPosUpdate(Win32Interop.Rect MainWindowPos)
+        {
+            if (this.InvokeRequired)
+            {
+                this.BeginInvoke(new ViewerPosUpdateDelegate(ViewerPosUpdate), new object[] { MainWindowPos });
+            }
+            else
+            {
+                switch (DockPos)
+                {
+                    case DockType.None:
+                        break;
+                    case DockType.Left:
+                        {
+                            this.Left = 0;
+                            this.Top = MainWindowPos.Top;
+                            this.Height = MainWindowPos.Bottom - MainWindowPos.Top;
+                            this.Width = MainWindowPos.Left;
+                        }
+                        break;
+                    case DockType.Top:
+                        {
+                            this.Left = MainWindowPos.Left;
+                            this.Top = MainWindowPos.Top - this.Height;
+                            this.Width = MainWindowPos.Right - MainWindowPos.Left;
+                        }
+                        break;
+                    case DockType.Right:
+                        {
+                            this.Left = MainWindowPos.Right;
+                            this.Top = MainWindowPos.Top;
+                            this.Height = MainWindowPos.Bottom - MainWindowPos.Top;
+                            this.Width = Screen.PrimaryScreen.WorkingArea.Width - MainWindowPos.Right;
+                        }
+                        break;
+                    case DockType.Bottom:
+                        {
+                            this.Left = MainWindowPos.Left;
+                            this.Top = MainWindowPos.Bottom;
+                            this.Width = MainWindowPos.Right - MainWindowPos.Left;
+                        }
+                        break;
+                }
+            }
+        }
+
+        delegate void ShowViewerDelegate();
+        public void ShowViewer()
+        {
+            if (this.InvokeRequired)
+            {
+                this.BeginInvoke(new ShowViewerDelegate(ShowViewer), null);
+            }
+            else
+            {
+                if (!this.Visible)
+                {
+                    ViewerThread = new Thread(new ParameterizedThreadStart(delegate(object obj)
+                    {
+                        ShowDialog();
+                    }));
+                    ViewerThread.Start();
+                    Thread.Sleep(1000);
+                }
+                else
+                {
+                    if (WindowState == System.Windows.Forms.FormWindowState.Minimized)
+                    {
+                        WindowState = System.Windows.Forms.FormWindowState.Normal;
+                        BringToFront();
+                    }
+                }
+            }
+        }
+
+        delegate void HideViewerDelegate();
+        public void HideViewer()
+        {
+            if (this.InvokeRequired)
+            {
+                this.BeginInvoke(new HideViewerDelegate(HideViewer), null);
+            }
+            else
+            {
+                if (Visible)
+                {
+                    Hide();
+                }
+            }
+        }
+
+        delegate void ReleaseViewerDelegate();
+        public void ReleaseViewer()
+        {
+            if (this.InvokeRequired)
+            {
+                this.BeginInvoke(new ReleaseViewerDelegate(ReleaseViewer), null);
+            }
+            else
+            {
+                if (Visible)
+                {
+                    Close();
+                    Dispose();
+                    ViewerThread.Join();
+                }
+            }
         }
 
         delegate void RefreshGuiDelegate();
@@ -499,18 +513,6 @@ namespace Communication.Interface.UI
             }
         }
 
-        private int ContainsFriendlyName(ICommunicationInterface CommunicationInterface)
-        {
-            for (int i = 0; i < IndicatorDictionary.Count; i++)
-            {
-                if (CommunicationInterface.FriendlyName.Equals(IndicatorDictionary.Keys.ToList<ICommunicationInterface>()[i].FriendlyName))
-                {
-                    return i;
-                }
-            }
-            return -1;
-        }
-
         private void toolStripTransparenceLow_Click(object sender, EventArgs e)
         {
             if (!toolStripTransparenceLow.Checked)
@@ -579,6 +581,44 @@ namespace Communication.Interface.UI
         {
             toolStripTopMostBtn.Checked = !toolStripTopMostBtn.Checked;
             this.TopMost = toolStripTopMostBtn.Checked;
+        }
+
+        delegate object UI_CALL_DELEGATE(string Fun, params object[] Args);
+        public object UI_CALL(string Fun, params object[] Args)
+        {
+            // Check we are in safe thread for all controls
+            // Because all controls in this form are create on same thread,should no problem use other control too.
+            if (this.InvokeRequired)
+            {
+                UI_CALL_DELEGATE CALL_DELEGATE = new UI_CALL_DELEGATE(UI_CALL);
+                try
+                {
+                    return Invoke(CALL_DELEGATE, new object[] { Fun, Args });
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show(e.Message);
+                    return null;
+                }
+            }
+            else
+            {
+
+                try
+                {
+                    // Now, It's safe to use all controls
+                    // Invoke function base on function name
+                    // Make sure the function we are tring to call have public access right
+
+                    return GetType().GetMethod(Fun).Invoke(this, Args);
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show(e.Message);
+                    return null;
+                }
+            }
+
         }
 
     }

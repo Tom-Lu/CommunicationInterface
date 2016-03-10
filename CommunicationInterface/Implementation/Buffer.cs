@@ -35,7 +35,7 @@ namespace Communication.Interface.Implementation
 
         public bool IsEmpty()
         {
-            return buffer_stream.Length > 0;
+            return buffer_stream.Length <= 0;
         }
 
         public byte[] GetBytes()
@@ -81,12 +81,14 @@ namespace Communication.Interface.Implementation
 
         public void Clear()
         {
-            buffer_stream.SetLength(0);
+            buffer_stream = new MemoryStream(buffer_stream.Capacity);
         }
 
         override public string ToString()
         {
-            return Encoding.ASCII.GetString(buffer_stream.GetBuffer());
+            byte[] temp_buffer = new byte[buffer_stream.Length];
+            Array.Copy(buffer_stream.GetBuffer(), temp_buffer, temp_buffer.Length);
+            return Encoding.ASCII.GetString(temp_buffer);
         }
 
         public bool Contains(string Lookup)

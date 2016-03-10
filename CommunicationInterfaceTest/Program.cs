@@ -19,7 +19,9 @@ namespace Communication.Interface.Test
             // Tcp - "Tcp:IP=127.0.0.1,Port=23"
             // You can use connection builder user interface to configure connection string "ShowCommunicationBuilder"
 
-            ICommunicationInterface CommInterface = CommunicationManager.InstanceInterface("Telnet:IP=127.0.0.1,Port=23", "LocalTest");
+            CommunicationManager.InitCommunicationViewer(UI.DockType.Right);
+            CommunicationManager.ShowCommunicationViewer();
+            ICommunicationInterface CommInterface = CommunicationManager.InstanceInterface("Telnet:IP=192.168.106.24,Port=23", "Zhone OLT");
 
             // Buffer update event handler for console applicaiton, for WinForm applicaiton you should use ShowCommunicationViewer to display the trace window
             CommInterface.BufferUpdatedHandler += new OnBufferUpdatedEvent(CommInterface_BufferUpdatedHandler);
@@ -27,23 +29,23 @@ namespace Communication.Interface.Test
             CommInterface.Open();
             if (CommInterface.IsOpened)
             {
+                CommunicationManager.GetCommunicationViewer().AddDisplayFilter("\n\r", "\r\n");
                 CommInterface.Timeout = 10;
-                CommInterface.StopToken = "test>";
-                CommInterface.WaitForString("login:", 100);
-                CommInterface.WriteLine("test");
-                CommInterface.WaitForString("password:", 100);
-                Thread.Sleep(100);
-                CommInterface.WriteLineWaitToken("test");
-                CommInterface.WriteLineWaitToken("ipconfig");
-                string LocalIP = string.Empty;
-                string LocalIPv6 = string.Empty;
-                CommInterface.ReadBuffer.ReadString("IPv4  . . . . . . . . . . . . :", out LocalIP);
-                CommInterface.ReadBuffer.ReadString("IPv6 . . . . . . . . :", out LocalIPv6);
-                CommInterface.WriteLineWaitToken("arp -a");
-                string Mac = string.Empty;
-                CommInterface.ReadBuffer.ReadString("192.168.1.1", out Mac);
-                CommInterface.WriteLineWaitToken("ping 192.168.1.1");
-                CommInterface.ReadBuffer.ReadString(@"IPv4\s*.*:", out Mac);
+                CommInterface.LineFeed = "\r\n";
+
+                bool login = CommInterface.WaitForString("login:", 10);
+                if (!login)
+                {
+                    Console.WriteLine("Cannot capture login message!");
+                }
+                CommInterface.WriteLine("admin");
+                CommInterface.WaitForString("password:", 10);
+                CommInterface.WriteLine("zhone");
+                CommInterface.WaitForString(">", 5);
+
+                CommInterface.StopToken = ">";
+
+                CommInterface.WriteLineWaitToken("swversion");
 
                 Console.WriteLine("Press any key continue ...");
                 Console.ReadKey();
