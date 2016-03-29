@@ -23,7 +23,7 @@ How to use:
             // Connection String Example:
             // SerialPort - "SerialPort:Port=COM5,BaudRate=115200,DataBits=8,Parity=None,StopBits=One"
             // Telnet - "Telnet:IP=127.0.0.1,Port=23"
-            // Ssh - "Ssh:IP=192.168.1.100,Port=23,Username=admin, Password=admin"
+            // Ssh - "PlinkSsh:IP=192.168.1.100,Port=23,Username=admin, Password=admin"
             // Tcp - "Tcp:IP=127.0.0.1,Port=23"
             // You can use connection builder user interface to configure connection string "ShowCommunicationBuilder"
 

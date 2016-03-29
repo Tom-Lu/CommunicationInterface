@@ -9,8 +9,8 @@ using System.Collections.Generic;
 
 namespace Communication.Interface.Implementation
 {
-    [InterfaceImplementation(Name = "SSH", Scheme = "Ssh", ConfigPanel = typeof(Panel.SshPanel))]
-    public class Ssh : AbsCommunicationInterface
+    [InterfaceImplementation(Name = "PlinkSsh", Scheme = "PlinkSsh", ConfigPanel = typeof(Panel.SshPanel))]
+    public class PlinkSsh : AbsCommunicationInterface
     {
         private static string PLINK_PATH = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "plink_mod.exe");
         private ProcessStartInfo Plink;
@@ -22,7 +22,7 @@ namespace Communication.Interface.Implementation
         private const int AsyncReadBufferLength = 0x4000;
         private byte[] AsyncReadBuffer;
 
-        public Ssh(string IpAddress, int Port) : base()
+        public PlinkSsh(string IpAddress, int Port) : base()
         {
             OutputBuffer = new Queue<byte>();
             Plink = new ProcessStartInfo()
@@ -39,7 +39,7 @@ namespace Communication.Interface.Implementation
 
         }
 
-        public Ssh(string ConfigString, string FriendlyName)
+        public PlinkSsh(string ConfigString, string FriendlyName)
             : base(ConfigString, FriendlyName)
         {
             if (FriendlyName == null || FriendlyName.Equals(string.Empty))

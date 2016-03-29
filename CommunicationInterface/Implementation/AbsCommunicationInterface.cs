@@ -10,16 +10,16 @@ namespace Communication.Interface.Implementation
     public abstract class AbsCommunicationInterface : ICommunicationInterface
     {
         protected string DEFAULT_LINE_FEED = "\r\n";
-        public static readonly int DefaultGlobalBufferSize = 40960;
-        public static readonly int DefaultFragmentBufferSize = 4096;
-        public static readonly int DefaultReadBufferSize = 4096;
+        internal static readonly int DefaultGlobalBufferSize = 40960;
+        internal static readonly int DefaultFragmentBufferSize = 4096;
+        internal static readonly int DefaultReadBufferSize = 4096;
 
-        internal IBufferInternal global_buffer = null;
-        internal IBufferInternal fragment_buffer = null;
-        internal IBufferInternal read_buffer = null;
+        protected IBufferInternal global_buffer = null;
+        protected IBufferInternal fragment_buffer = null;
+        protected IBufferInternal read_buffer = null;
 
-        internal bool FragmentBufferRecord = false;
         private string config_string = string.Empty;
+        protected bool fragment_buffer_record = false;
         protected string friendly_name = string.Empty;
         protected Dictionary<string, string> Config = null;
 
@@ -157,7 +157,7 @@ namespace Communication.Interface.Implementation
             if (!read_buffer.IsEmpty())
             {
                 global_buffer.Append((IBufferInternal)read_buffer);
-                if (FragmentBufferRecord)
+                if (fragment_buffer_record)
                 {
                     fragment_buffer.Append((IBufferInternal)read_buffer);
                 }
@@ -283,13 +283,13 @@ namespace Communication.Interface.Implementation
 
         public void StartFragmentBufferRecord()
         {
-            FragmentBufferRecord = true;
+            fragment_buffer_record = true;
             FragmentBuffer.Clear();
         }
 
         public IBuffer StopFragmentBufferRecord()
         {
-            FragmentBufferRecord = false;
+            fragment_buffer_record = false;
             return FragmentBuffer;
         }
 

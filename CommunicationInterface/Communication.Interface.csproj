@@ -92,7 +92,7 @@
     <Compile Include="UI\CommunicationBuilder.Designer.cs">
       <DependentUpon>CommunicationBuilder.cs</DependentUpon>
     </Compile>
-    <Compile Include="Implementation\Ssh.cs" />
+    <Compile Include="Implementation\PlinkSsh.cs" />
     <Compile Include="Implementation\SerialTel.cs" />
     <Compile Include="InterfaceImplementation.cs" />
     <Compile Include="IBuffer.cs" />

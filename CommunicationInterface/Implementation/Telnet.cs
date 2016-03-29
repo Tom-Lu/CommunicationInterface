@@ -202,7 +202,7 @@ namespace Communication.Interface.Implementation
             if (!read_buffer.IsEmpty())
             {
                 global_buffer.Append((IBufferInternal)read_buffer);
-                if (FragmentBufferRecord)
+                if (fragment_buffer_record)
                 {
                     fragment_buffer.Append((IBufferInternal)read_buffer);
                 }
