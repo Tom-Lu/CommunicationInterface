@@ -46,7 +46,7 @@ namespace Communication.Interface.Implementation
         /// </summary>
         /// <param name="ConfigString">Configuration String</param>
         /// <param name="FriendlyName">Friendly Name</param>
-        internal AbsCommunicationInterface(string ConfigString, string FriendlyName) : this()
+        public AbsCommunicationInterface(string ConfigString, string FriendlyName) : this()
         {
             this.config_string = ConfigString;
             this.friendly_name = FriendlyName;
@@ -175,6 +175,7 @@ namespace Communication.Interface.Implementation
             do
             {
                 last_read_buffer.Append(ReadUntil(Pattern));
+                Thread.Sleep(100);
             } while (!last_read_buffer.ToString().Contains(Pattern) && ((DateTime.Now - start_time).TotalSeconds < Timeout));
 
             ((IBufferInternal)read_buffer).Copy(last_read_buffer);

@@ -19,9 +19,12 @@ namespace Communication.Interface.Test
             // Tcp - "Tcp:IP=127.0.0.1,Port=23"
             // You can use connection builder user interface to configure connection string "ShowCommunicationBuilder"
 
+            // L2Telnet:ConfigFile=WAW-1P.network, Adapter=UUT SOCKET 1, LocalPort=8090, RemoteIP=192.168.1.100, RemoteMAC=00:00:00:00:00:00, RemotePort=23
+
             CommunicationManager.InitCommunicationViewer(UI.DockType.Right);
             CommunicationManager.ShowCommunicationViewer();
-            ICommunicationInterface CommInterface = CommunicationManager.InstanceInterface("Telnet:IP=192.168.106.24,Port=23", "Zhone OLT");
+            ICommunicationInterface CommInterface = CommunicationManager.InstanceInterface("L2Telnet:IP=192.168.1.1, Port=23, Adapter=SOCKET_1, ConfigFile=WAW-1P.network", "Zhone OLT");
+            // ICommunicationInterface CommInterface = CommunicationManager.InstanceInterface("Telnet:IP=192.168.106.24,Port=23", "Zhone OLT");
 
             // Buffer update event handler for console applicaiton, for WinForm applicaiton you should use ShowCommunicationViewer to display the trace window
             CommInterface.BufferUpdatedHandler += new OnBufferUpdatedEvent(CommInterface_BufferUpdatedHandler);
@@ -33,13 +36,13 @@ namespace Communication.Interface.Test
                 CommInterface.Timeout = 10;
                 CommInterface.LineFeed = "\r\n";
 
-                bool login = CommInterface.WaitForString("login:", 10);
+                bool login = CommInterface.WaitForString("Login:", 10);
                 if (!login)
                 {
                     Console.WriteLine("Cannot capture login message!");
                 }
                 CommInterface.WriteLine("admin");
-                CommInterface.WaitForString("password:", 10);
+                CommInterface.WaitForString("Password:", 10);
                 CommInterface.WriteLine("zhone");
                 CommInterface.WaitForString(">", 5);
 
@@ -54,6 +57,8 @@ namespace Communication.Interface.Test
             // Close communication interface
             CommInterface.Close();
             CommInterface = null;
+            CommunicationManager.HideCommunicationViewer();
+            CommunicationManager.Cleanup();
         }
 
         static void CommInterface_BufferUpdatedHandler(string Buffer)

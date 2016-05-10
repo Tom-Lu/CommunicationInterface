@@ -2,20 +2,18 @@
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{A1D3877B-1AB5-4842-8F68-1D6F7CB81A03}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{6563F429-C7D1-4EF8-A017-BC1BF8727828}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Communication.Interface.Test</RootNamespace>
-    <AssemblyName>Communication.Interface.Test</AssemblyName>
+    <RootNamespace>Layer2Telnet</RootNamespace>
+    <AssemblyName>Layer2Telnet</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
-    <PlatformTarget>x86</PlatformTarget>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -24,8 +22,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
-    <PlatformTarget>x86</PlatformTarget>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -34,9 +31,20 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="PcapDotNet.Base">
+      <HintPath>PcapDotNet\PcapDotNet.Base.dll</HintPath>
+    </Reference>
+    <Reference Include="PcapDotNet.Core">
+      <HintPath>PcapDotNet\PcapDotNet.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="PcapDotNet.Core.Extensions">
+      <HintPath>PcapDotNet\PcapDotNet.Core.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="PcapDotNet.Packets">
+      <HintPath>PcapDotNet\PcapDotNet.Packets.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -44,17 +52,21 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Program.cs" />
+    <Compile Include="ArpService.cs" />
+    <Compile Include="IcmpService.cs" />
+    <Compile Include="ITcpSession.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TcpService.cs" />
+    <Compile Include="TcpSession.cs" />
+    <Compile Include="Telnet.cs" />
+    <Compile Include="UtilityLib.cs" />
+    <Compile Include="VirtualAdapter.cs" />
+    <Compile Include="VirtualNetwork.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CommunicationInterface\Communication.Interface.csproj">
       <Project>{DE0D2D05-8579-4049-BB9C-34297E292F8C}</Project>
       <Name>Communication.Interface</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Layer2Telnet\Layer2Telnet.csproj">
-      <Project>{6563F429-C7D1-4EF8-A017-BC1BF8727828}</Project>
-      <Name>Layer2Telnet</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
