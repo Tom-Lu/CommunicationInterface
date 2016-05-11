@@ -97,7 +97,7 @@ namespace Layer2Net
                     _live_packet_device = _physical_insterface.GetLivePacketDevice();
                     if (_instance._live_packet_device != null)
                     {
-                        _instance._packet_communicator = _instance._live_packet_device.Open(65536, PacketDeviceOpenAttributes.MaximumResponsiveness | PacketDeviceOpenAttributes.NoCaptureLocal, 500);
+                        _instance._packet_communicator = _instance._live_packet_device.Open(65536, PacketDeviceOpenAttributes.Promiscuous | PacketDeviceOpenAttributes.NoCaptureLocal, 50);
                         if (_instance._packet_communicator != null)
                         {
                             StringBuilder filter = new StringBuilder();
@@ -112,7 +112,7 @@ namespace Layer2Net
 
                             _instance._packet_process_thread = new Thread(new System.Threading.ParameterizedThreadStart(delegate(object obj)
                             {
-                                _instance._packet_communicator.ReceivePackets(0, _instance.PacketProcess);
+                                _instance._packet_communicator.ReceivePackets(-1, _instance.PacketProcess);
                             }));
 
                             _instance._packet_process_thread.Name = "PacketProcessThread";

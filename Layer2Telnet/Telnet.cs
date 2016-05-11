@@ -53,9 +53,6 @@ namespace Layer2Telnet
         private ManualResetEvent _connection_wait_handle = new ManualResetEvent(false);
         private Queue<byte> InputBuffer;
         private object InputBufferLocker = new Object();
-        private Queue<Packet> OutputBuffer;
-        private object OutputBufferLocker = new Object();
-
         private VirtualAdapter Adapter = null;
 
         public Telnet(string ConfigString, string FriendlyName) : base(ConfigString, FriendlyName)
@@ -163,7 +160,6 @@ namespace Layer2Telnet
         {
             VirtualNetwork.Instance.PostTraceMessage("TCP OPEN: " + _remote_ip.ToString() + " " + _remote_port.ToString());
             InputBuffer = new Queue<byte>();
-            OutputBuffer = new Queue<Packet>();
             _connection_wait_handle.Reset();
             SendTcpCtrlPacket(0, TcpControlBits.Synchronize);    // ACK = false, SYNC = true, FIN = false
             _current_state = TCP_STATE.SYN_SENT;
@@ -213,16 +209,11 @@ namespace Layer2Telnet
 
             int data = -1;
 
-            if (InputBuffer != null)
+            if (InputBuffer.Count > 0)
             {
-                lock (InputBufferLocker)
-                {
-                    if (InputBuffer.Count > 0)
-                    {
-                        data = InputBuffer.Dequeue();
-                    }
-                }
+                data = InputBuffer.Dequeue();
             }
+
             return data;
         }
 
@@ -244,41 +235,6 @@ namespace Layer2Telnet
             }
 
             SendPacket(data);
-        }
-
-        private void ProcessOutputBuffer(uint AcknowledgmentNumber)
-        {
-            bool Done = false;
-            while (!Done)
-            {
-                if (OutputBuffer.Count > 0)
-                {
-                    Packet packet = OutputBuffer.Peek();
-                    uint NextSequenceNumber = packet.Ethernet.IpV4.Tcp.NextSequenceNumber;
-                    if(_adapter.VLAN > 1)
-                    {
-                        NextSequenceNumber = packet.Ethernet.VLanTaggedFrame.IpV4.Tcp.NextSequenceNumber;
-                    }
-
-                    if (AcknowledgmentNumber >= NextSequenceNumber)
-                    {
-                        OutputBuffer.Dequeue();
-                    }
-                    else
-                    {
-                        Done = true;
-                    }
-                }
-                else
-                {
-                    Done = true;
-                }
-
-            }
-            if (OutputBuffer.Count > 0)
-            {
-                VirtualNetwork.Instance.SendPacket(OutputBuffer.Peek());
-            }
         }
 
         public void ProcessTCP(IpV4Datagram packet)
@@ -342,25 +298,29 @@ namespace Layer2Telnet
                 }
                 else if (PSH)   // 需处理传输数据
                 {
-                    MemoryStream PayloadStream = tcp.Payload.ToMemoryStream();
-                    lock (InputBufferLocker)
+                    if (tcp.SequenceNumber == _last_acknowledgment_number)
                     {
-                        for (int i = 0; i < PayloadStream.Length; i++)
+                        MemoryStream PayloadStream = tcp.Payload.ToMemoryStream();
+                        lock (InputBufferLocker)
                         {
-                            InputBuffer.Enqueue((byte)PayloadStream.ReadByte());
+                            for (int i = 0; i < PayloadStream.Length; i++)
+                            {
+                                InputBuffer.Enqueue((byte)PayloadStream.ReadByte());
+                            }
                         }
+
+                        SendTcpCtrlPacket(tcp.SequenceNumber + (uint)tcp.PayloadLength, TcpControlBits.Acknowledgment);
                     }
-                    SendTcpCtrlPacket(tcp.SequenceNumber + (uint)tcp.PayloadLength, TcpControlBits.Acknowledgment);
+                    else if (ACK && tcp.SequenceNumber == _last_acknowledgment_number - 1)  // Keep Alive
+                    {
+                        SendTcpCtrlPacket(_last_acknowledgment_number, TcpControlBits.Acknowledgment);
+                    }
                 }
                 else if (ACK && _current_state == TCP_STATE.ESTABLISHED)
                 {
                     if (tcp.SequenceNumber == _last_acknowledgment_number - 1) // Keep Alive
                     {
                         SendTcpCtrlPacket(_last_acknowledgment_number, TcpControlBits.Acknowledgment);
-                    }
-                    else
-                    {
-                        ProcessOutputBuffer(tcp.AcknowledgmentNumber);
                     }
                 }
 
@@ -542,10 +502,6 @@ namespace Layer2Telnet
                     }
 
                     VirtualNetwork.Instance.SendPacket(packet);
-                    lock (OutputBufferLocker)
-                    {
-                        OutputBuffer.Enqueue(packet);
-                    }
                 }
             }
             else
@@ -563,10 +519,6 @@ namespace Layer2Telnet
                 }
 
                 VirtualNetwork.Instance.SendPacket(packet);
-                lock (OutputBufferLocker)
-                {
-                    OutputBuffer.Enqueue(packet);
-                }
             }
         }
 
@@ -603,7 +555,7 @@ namespace Layer2Telnet
                                     {
                                         option = ReadByte();
                                         // Refuse all request
-                                        Write(new byte[] { (byte)TELNET_CMD.IAC, (byte)TELNET_CMD.DONT, (byte)option });
+                                        // Write(new byte[] { (byte)TELNET_CMD.IAC, (byte)TELNET_CMD.DONT, (byte)option });
 
                                         break;
                                     }
@@ -615,7 +567,7 @@ namespace Layer2Telnet
                                 case TELNET_CMD.WILL:
                                     {
                                         option = ReadByte();
-                                        Write(new byte[] { (byte)TELNET_CMD.IAC, (byte)TELNET_CMD.WONT, (byte)option });
+                                        // Write(new byte[] { (byte)TELNET_CMD.IAC, (byte)TELNET_CMD.WONT, (byte)option });
                                         break;
                                     }
                                 case TELNET_CMD.WONT:
