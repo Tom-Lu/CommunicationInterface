@@ -38,6 +38,7 @@ namespace Layer2Telnet
 
         private const ushort CONNECTION_TIMEOUT = 20000;
         private const ushort TCP_OPEN_TIMEOUT = 1000;
+        private const ushort KEEP_ALIVE_PERIOD = 1000;
         private TcpService _service = null;
         private VirtualAdapter _adapter = null;
         private ushort _local_port;
@@ -50,6 +51,7 @@ namespace Layer2Telnet
         private uint _last_acknowledgment_number = 0;
         private ushort _local_tcp_window_size = 65535;
         private ushort _remote_tcp_window_size = 0;
+        private DateTime _last_read_available_time = DateTime.Now;
         private ManualResetEvent _connection_wait_handle = new ManualResetEvent(false);
         private Queue<byte> InputBuffer;
         private object InputBufferLocker = new Object();
@@ -212,6 +214,15 @@ namespace Layer2Telnet
             if (InputBuffer.Count > 0)
             {
                 data = InputBuffer.Dequeue();
+                _last_read_available_time = DateTime.Now;
+            }
+            else
+            {
+                if ((DateTime.Now - _last_read_available_time).TotalMilliseconds >= KEEP_ALIVE_PERIOD)
+                {
+                    _adapter.ArpService.SendGratuitus();
+                    _last_read_available_time = DateTime.Now;
+                }
             }
 
             return data;
