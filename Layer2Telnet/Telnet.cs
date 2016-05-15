@@ -38,7 +38,7 @@ namespace Layer2Telnet
 
         private const ushort CONNECTION_TIMEOUT = 20000;
         private const ushort TCP_OPEN_TIMEOUT = 1000;
-        private const ushort KEEP_ALIVE_PERIOD = 1000;
+        private const ushort KEEP_ALIVE_PERIOD = 500;
         private TcpService _service = null;
         private VirtualAdapter _adapter = null;
         private ushort _local_port;
