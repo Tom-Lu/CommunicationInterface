@@ -20,7 +20,6 @@ namespace Layer2Net
     {
         public delegate void TraceMessageHandler(string Message);
 
-        private const uint SEND_BUFFER_SIZE = 40960;
         public string Filename { get; set; }
         private static VirtualNetwork _instance = null;
         private NetworkInterface _physical_insterface = null;
@@ -29,7 +28,6 @@ namespace Layer2Net
         private List<VirtualAdapter> _adapters = null;
         private Hashtable _adapter_hashtable = null;
         private Thread _packet_process_thread = null;
-        // private PacketSendBuffer _send_buffer = null;
         public event TraceMessageHandler TraceHandler;
 
         public static VirtualNetwork Instance
@@ -228,12 +226,6 @@ namespace Layer2Net
         {
             _packet_communicator.SendPacket(packet);
         }
-
-        //public void TransmitPacket(Packet packet)
-        //{
-        //    _send_buffer.Enqueue(packet);
-        //    _packet_communicator.Transmit(_send_buffer, false);
-        //}
 
         public void PostTraceMessage(string Message, bool AppendLineFeed = true)
         {
