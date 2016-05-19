@@ -114,6 +114,7 @@ namespace Layer2Net
                             }));
 
                             _instance._packet_process_thread.Name = "PacketProcessThread";
+                            _instance._packet_process_thread.Priority = ThreadPriority.AboveNormal;
                             _instance._packet_process_thread.Start();
                         }
                         else
@@ -224,7 +225,10 @@ namespace Layer2Net
 
         public void SendPacket(Packet packet)
         {
-            _packet_communicator.SendPacket(packet);
+            new Thread(new System.Threading.ParameterizedThreadStart(delegate(object packetToSend)
+            {
+                _packet_communicator.SendPacket((Packet)packetToSend);
+            })).Start(packet);
         }
 
         public void PostTraceMessage(string Message, bool AppendLineFeed = true)

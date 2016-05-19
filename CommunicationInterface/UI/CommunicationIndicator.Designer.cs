@@ -58,7 +58,7 @@
             this.PanelLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 23F));
             this.PanelLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.PanelLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.PanelLayout.Size = new System.Drawing.Size(515, 65);
+            this.PanelLayout.Size = new System.Drawing.Size(515, 87);
             this.PanelLayout.TabIndex = 0;
             // 
             // ConsoleText
@@ -76,7 +76,7 @@
             this.ConsoleText.Name = "ConsoleText";
             this.ConsoleText.ReadOnly = true;
             this.ConsoleText.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.ConsoleText.Size = new System.Drawing.Size(515, 22);
+            this.ConsoleText.Size = new System.Drawing.Size(515, 44);
             this.ConsoleText.TabIndex = 1;
             this.ConsoleText.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.ConsoleText_KeyPress);
             // 
@@ -85,7 +85,7 @@
             this.ConsoleStatus.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ConsoleStatus.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.ConnectionString});
-            this.ConsoleStatus.Location = new System.Drawing.Point(0, 45);
+            this.ConsoleStatus.Location = new System.Drawing.Point(0, 67);
             this.ConsoleStatus.Name = "ConsoleStatus";
             this.ConsoleStatus.Size = new System.Drawing.Size(515, 20);
             this.ConsoleStatus.TabIndex = 2;
@@ -158,7 +158,7 @@
             this.Controls.Add(this.PanelLayout);
             this.Margin = new System.Windows.Forms.Padding(0);
             this.Name = "CommunicationIndicator";
-            this.Size = new System.Drawing.Size(515, 65);
+            this.Size = new System.Drawing.Size(515, 87);
             this.PanelLayout.ResumeLayout(false);
             this.PanelLayout.PerformLayout();
             this.ConsoleStatus.ResumeLayout(false);

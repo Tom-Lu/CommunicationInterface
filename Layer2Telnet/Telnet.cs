@@ -204,24 +204,28 @@ namespace Layer2Telnet
 
         override public int ReadByte()
         {
-            if (!IsOpen)
-            {
-                throw new Exception("Cannot perform read/write operation on closed connection!");
-            }
-
             int data = -1;
 
             if (InputBuffer.Count > 0)
             {
-                data = InputBuffer.Dequeue();
+                lock (InputBufferLocker)
+                {
+                    if (InputBuffer.Count > 0)
+                    {
+                        data = InputBuffer.Dequeue();
+                    }
+                }
                 _last_read_available_time = DateTime.Now;
             }
             else
             {
-                if ((DateTime.Now - _last_read_available_time).TotalMilliseconds >= KEEP_ALIVE_PERIOD)
+                if (IsOpen)
                 {
-                    _adapter.ArpService.SendGratuitus();
-                    _last_read_available_time = DateTime.Now;
+                    if ((DateTime.Now - _last_read_available_time).TotalMilliseconds >= KEEP_ALIVE_PERIOD)
+                    {
+                        _adapter.ArpService.SendGratuitus();
+                        _last_read_available_time = DateTime.Now;
+                    }
                 }
             }
 
@@ -230,22 +234,18 @@ namespace Layer2Telnet
 
         override public void Write(byte data)
         {
-            if (!IsOpen)
+            if (IsOpen)
             {
-                throw new Exception("Cannot perform read/write operation on closed connection!");
+                SendPacket(new byte[] { data });
             }
-
-            SendPacket(new byte[] { data });
         }
 
         override public void Write(byte[] data)
         {
-            if (!IsOpen)
+            if (IsOpen)
             {
-                throw new Exception("Cannot perform read/write operation on closed connection!");
+                SendPacket(data);
             }
-
-            SendPacket(data);
         }
 
         public void ProcessTCP(IpV4Datagram packet)
@@ -311,16 +311,19 @@ namespace Layer2Telnet
                 {
                     if (tcp.SequenceNumber == _last_acknowledgment_number)
                     {
-                        MemoryStream PayloadStream = tcp.Payload.ToMemoryStream();
-                        lock (InputBufferLocker)
+                        try
                         {
-                            for (int i = 0; i < PayloadStream.Length; i++)
+                            MemoryStream PayloadStream = tcp.Payload.ToMemoryStream();
+                            lock (InputBufferLocker)
                             {
-                                InputBuffer.Enqueue((byte)PayloadStream.ReadByte());
+                                for (int i = 0; i < PayloadStream.Length; i++)
+                                {
+                                    InputBuffer.Enqueue((byte)PayloadStream.ReadByte());
+                                }
                             }
-                        }
 
-                        SendTcpCtrlPacket(tcp.SequenceNumber + (uint)tcp.PayloadLength, TcpControlBits.Acknowledgment);
+                            SendTcpCtrlPacket(tcp.SequenceNumber + (uint)tcp.PayloadLength, TcpControlBits.Acknowledgment);
+                        } catch {}
                     }
                     else if (ACK && tcp.SequenceNumber == _last_acknowledgment_number - 1)  // Keep Alive
                     {
@@ -359,7 +362,6 @@ namespace Layer2Telnet
         void SendTcpCtrlPacket(uint AcknowledgmentNumber, TcpControlBits CtrlBits)
         {
             _last_acknowledgment_number = AcknowledgmentNumber;
-            Packet packet = null;
             EthernetLayer ethernetLayer =
                 new EthernetLayer
                 {
@@ -410,14 +412,13 @@ namespace Layer2Telnet
 
             if (_adapter.VLAN > 1)
             {
-                packet = PacketBuilder.Build(DateTime.Now, ethernetLayer, vlanLayer, ipV4Layer, tcpLayer);
+                VirtualNetwork.Instance.SendPacket(PacketBuilder.Build(DateTime.Now, ethernetLayer, vlanLayer, ipV4Layer, tcpLayer));
             }
             else
             {
-                packet = PacketBuilder.Build(DateTime.Now, ethernetLayer, ipV4Layer, tcpLayer);
+                VirtualNetwork.Instance.SendPacket(PacketBuilder.Build(DateTime.Now, ethernetLayer, ipV4Layer, tcpLayer));
             }
 
-            VirtualNetwork.Instance.SendPacket(packet);
             if (CtrlBits != TcpControlBits.Acknowledgment)
             {
                 _current_sequence_number++;
@@ -509,10 +510,8 @@ namespace Layer2Telnet
                     }
                     else
                     {
-                        packet = PacketBuilder.Build(DateTime.Now, ethernetLayer, ipV4Layer, tcpLayer, payloadLayer);
+                        VirtualNetwork.Instance.SendPacket(PacketBuilder.Build(DateTime.Now, ethernetLayer, ipV4Layer, tcpLayer, payloadLayer));
                     }
-
-                    VirtualNetwork.Instance.SendPacket(packet);
                 }
             }
             else
@@ -522,14 +521,12 @@ namespace Layer2Telnet
 
                 if (_adapter.VLAN > 1)
                 {
-                    packet = PacketBuilder.Build(DateTime.Now, ethernetLayer, vlanLayer, ipV4Layer, tcpLayer, payloadLayer);
+                    VirtualNetwork.Instance.SendPacket(PacketBuilder.Build(DateTime.Now, ethernetLayer, vlanLayer, ipV4Layer, tcpLayer, payloadLayer));
                 }
                 else
                 {
-                    packet = PacketBuilder.Build(DateTime.Now, ethernetLayer, ipV4Layer, tcpLayer, payloadLayer);               
+                    VirtualNetwork.Instance.SendPacket(PacketBuilder.Build(DateTime.Now, ethernetLayer, ipV4Layer, tcpLayer, payloadLayer));               
                 }
-
-                VirtualNetwork.Instance.SendPacket(packet);
             }
         }
 
