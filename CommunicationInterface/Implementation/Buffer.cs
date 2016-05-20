@@ -47,6 +47,7 @@ namespace Communication.Interface.Implementation
         {
             if (source != null)
             {
+                source.BufferStream.Position = 0; // Importent
                 source.BufferStream.CopyTo(buffer_stream);
             }
         }
@@ -61,6 +62,7 @@ namespace Communication.Interface.Implementation
             if (source != null)
             {
                 buffer_stream.SetLength(0);
+                source.BufferStream.Position = 0; // Importent
                 source.BufferStream.CopyTo(buffer_stream);
             }
         }

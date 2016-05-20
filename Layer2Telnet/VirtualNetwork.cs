@@ -225,10 +225,17 @@ namespace Layer2Net
 
         public void SendPacket(Packet packet)
         {
-            new Thread(new System.Threading.ParameterizedThreadStart(delegate(object packetToSend)
+            new Thread(new System.Threading.ParameterizedThreadStart(delegate(object obj)
             {
-                _packet_communicator.SendPacket((Packet)packetToSend);
-            })).Start(packet);
+                if (_packet_communicator !=null && packet != null)
+                {
+                    try
+                    {
+                        _packet_communicator.SendPacket(packet);
+                    }
+                    catch {}
+                }
+            })).Start();
         }
 
         public void PostTraceMessage(string Message, bool AppendLineFeed = true)

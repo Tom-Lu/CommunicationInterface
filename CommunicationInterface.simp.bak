@@ -22,10 +22,6 @@
         <value>15</value>
       </counter>
       <counter>
-        <item-type stereotype="" type="AbstractElementGroup" />
-        <value>615</value>
-      </counter>
-      <counter>
         <item-type stereotype="" type="UmlRealization" />
         <value>4</value>
       </counter>
@@ -56,6 +52,10 @@
       <counter>
         <item-type stereotype="" type="UmlGeneralization" />
         <value>7</value>
+      </counter>
+      <counter>
+        <item-type stereotype="" type="AbstractElementGroup" />
+        <value>21</value>
       </counter>
     </entity-ids>
     <diagrams>
@@ -108,7 +108,7 @@
   </types>
   <filters />
   <items>
-    <item id="di213454896638413079" cid="ELEM002" type="uml-provided-interface-connector" name="" style-class="" visibility="package" creation-date="01/29/2016 10:43:25" from="di618925336382312242" to="di183866343871399109">
+    <item id="di213454896638413079" cid="ELEM002" type="uml-provided-interface-connector" name="" style-class="" visibility="package" creation-date="01/29/2016 10:43:25" from="di618925336382312242">
       <style class="default" />
     </item>
   </items>
@@ -304,7 +304,7 @@
           <item id="di406849803591610613" cid="REA001" type="realization" name="Implements" style-class="" visibility="package" change-tracking-state="added" creation-date="01/29/2016 10:39:51" from="di190316659782073508" to="di618925336382312242">
             <style class="default" />
           </item>
-          <item id="di111429092478185759" cid="ELEM001" type="uml-required-interface-connector" name="" style-class="" visibility="package" change-tracking-state="added" creation-date="01/29/2016 10:42:22" from="di506105343767724765" to="di401076669206180194">
+          <item id="di111429092478185759" cid="ELEM001" type="uml-required-interface-connector" name="" style-class="" visibility="package" change-tracking-state="added" creation-date="01/29/2016 10:42:22" from="di506105343767724765">
             <style class="default" />
           </item>
           <item id="di382104337607629159" cid="REA003" type="realization" name="Implements" style-class="" visibility="package" change-tracking-state="added" creation-date="01/29/2016 11:17:44" from="di325474491994968641" to="di506105343767724765">
