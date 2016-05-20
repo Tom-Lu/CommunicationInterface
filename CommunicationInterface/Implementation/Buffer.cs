@@ -12,12 +12,9 @@ namespace Communication.Interface.Implementation
     {
         private const string line_splitter = "\r\n";
         private MemoryStream buffer_stream = null;
-        private byte[] buffer = null;
-        private long index = 0;
         internal Buffer(int Capacity)
         {
             buffer_stream = new MemoryStream(Capacity);
-            buffer = new byte[Capacity];
             RegexMatchOption = RegexOptions.Multiline;
         }
 
