@@ -37,6 +37,14 @@ namespace Communication.Interface.UI
         {
             InitializeComponent();
 
+            Version LibraryVersion = Assembly.GetExecutingAssembly().GetName().Version;
+            DateTime BuildDate = new DateTime(2000, 1, 1)
+                .AddDays(LibraryVersion.Build)
+                .AddSeconds(LibraryVersion.Revision * 2);
+
+            this.Text = string.Format("CommViewer V{0}.{1}.{2} {3}", LibraryVersion.Major, LibraryVersion.Minor, LibraryVersion.Revision, BuildDate.ToString("yyyyMMddHHmmss"));
+		    
+
             IndicatorDictionary = new Dictionary<ICommunicationInterface, TabPage>();
             DisplayFilterDictionary = new Dictionary<string, string>();
             toolStripTopMostBtn.Checked = false;
