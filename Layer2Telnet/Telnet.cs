@@ -45,6 +45,7 @@ namespace Layer2Telnet
         private IpV4Address _remote_ip;
         private MacAddress _remote_mac;
         private ushort _remote_port;
+        private bool _response_telnet_ctrl = false;
 
         private TCP_STATE _current_state = TCP_STATE.CLOSED;
         private uint _current_sequence_number = 0;
@@ -85,6 +86,11 @@ namespace Layer2Telnet
             if (Config.ContainsKey("MAC") && !string.IsNullOrEmpty(Config["MAC"]))
             {
                 this._remote_mac = new MacAddress(Config["MAC"]);
+            }
+
+            if (Config.ContainsKey("RESPONSE_TELNET_CTRL") && !string.IsNullOrEmpty(Config["RESPONSE_TELNET_CTRL"]))
+            {
+                this._response_telnet_ctrl = bool.Parse(Config["RESPONSE_TELNET_CTRL"]);
             }
 
             _current_state = TCP_STATE.CLOSED;
@@ -562,9 +568,11 @@ namespace Layer2Telnet
                                 case TELNET_CMD.DO:
                                     {
                                         option = ReadByte();
-                                        // Refuse all request
-                                        // Write(new byte[] { (byte)TELNET_CMD.IAC, (byte)TELNET_CMD.DONT, (byte)option });
-
+                                        if (_response_telnet_ctrl)
+                                        {
+                                            // Refuse all request
+                                            Write(new byte[] { (byte)TELNET_CMD.IAC, (byte)TELNET_CMD.DONT, (byte)option });
+                                        }
                                         break;
                                     }
                                 case TELNET_CMD.DONT:
@@ -575,7 +583,10 @@ namespace Layer2Telnet
                                 case TELNET_CMD.WILL:
                                     {
                                         option = ReadByte();
-                                        // Write(new byte[] { (byte)TELNET_CMD.IAC, (byte)TELNET_CMD.WONT, (byte)option });
+                                        if (_response_telnet_ctrl)
+                                        {
+                                            Write(new byte[] { (byte)TELNET_CMD.IAC, (byte)TELNET_CMD.WONT, (byte)option });
+                                        }
                                         break;
                                     }
                                 case TELNET_CMD.WONT:
