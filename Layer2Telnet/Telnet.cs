@@ -37,6 +37,7 @@ namespace Layer2Telnet
         private static VirtualNetwork Network = null;
 
         private const ushort CONNECTION_TIMEOUT = 20000;
+        private const ushort DISCONNECT_TIMEOUT = 2000;
         private const ushort TCP_OPEN_TIMEOUT = 1000;
         private const ushort KEEP_ALIVE_PERIOD = 500;
         private TcpService _service = null;
@@ -190,7 +191,7 @@ namespace Layer2Telnet
                 _connection_wait_handle.Reset();
                 SendTcpCtrlPacket(_last_acknowledgment_number, TcpControlBits.Fin | TcpControlBits.Acknowledgment);
                 _current_state = TCP_STATE.FIN_WAIT_1;
-                _connection_wait_handle.WaitOne(CONNECTION_TIMEOUT, true); // wait for connection process finish
+                _connection_wait_handle.WaitOne(DISCONNECT_TIMEOUT, true); // wait for connection process finish
 
                 if (_current_state == TCP_STATE.CLOSED)
                 {
