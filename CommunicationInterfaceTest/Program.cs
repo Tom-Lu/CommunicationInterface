@@ -41,6 +41,7 @@ namespace Communication.Interface.Test
                 {
                     Console.WriteLine("Cannot capture login message!");
                 }
+                CommunicationManager.GetCommunicationViewer().Save(CommInterface.FriendlyName, "d:\\testlog.txt", true);
                 CommInterface.WriteLine("admin");
                 CommInterface.WaitForString("Password:", 10);
                 CommInterface.WriteLine("zhone");

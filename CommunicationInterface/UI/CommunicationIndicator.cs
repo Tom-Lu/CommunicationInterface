@@ -11,6 +11,7 @@ using Communication.Interface;
 using System.Threading;
 using System.Runtime.InteropServices;
 using System.IO.Pipes;
+using System.IO;
 
 namespace Communication.Interface.UI
 {
@@ -180,6 +181,24 @@ namespace Communication.Interface.UI
         {
             ConsoleText.AppendText(FilterText(text));
             ConsoleText.ScrollToCaret();
+        }
+
+        delegate void SaveDelegate(string FileName, bool Overwrite);
+        public void Save(string FileName, bool Overwrite)
+        {
+            if (this.InvokeRequired)
+            {
+                this.BeginInvoke(new SaveDelegate(Save), new object[] { FileName, Overwrite });
+            }
+            else
+            {
+                if (File.Exists(FileName) && Overwrite)
+                {
+                    File.Delete(FileName);
+                }
+
+                File.AppendAllText(FileName, ConsoleText.Text);
+            }
         }
 
         private string FilterText(string text)

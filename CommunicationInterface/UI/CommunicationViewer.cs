@@ -290,7 +290,7 @@ namespace Communication.Interface.UI
         {
             if (!IndicatorDictionary.ContainsKey(CommunicationInterface))
             {
-                int index = ContainsFriendlyName(CommunicationInterface);
+                int index = IndicatorContainsFriendlyName(CommunicationInterface.FriendlyName);
                 if (index == -1)
                 {
                     TabPage IndicatorPage = new TabPage(CommunicationInterface.FriendlyName);
@@ -326,11 +326,11 @@ namespace Communication.Interface.UI
             RefreshGui();
         }
 
-        private int ContainsFriendlyName(ICommunicationInterface CommunicationInterface)
+        private int IndicatorContainsFriendlyName(string FriendlyName)
         {
             for (int i = 0; i < IndicatorDictionary.Count; i++)
             {
-                if (CommunicationInterface.FriendlyName.Equals(IndicatorDictionary.Keys.ToList<ICommunicationInterface>()[i].FriendlyName))
+                if (FriendlyName.Equals(IndicatorDictionary.Keys.ToList<ICommunicationInterface>()[i].FriendlyName))
                 {
                     return i;
                 }
@@ -629,5 +629,15 @@ namespace Communication.Interface.UI
 
         }
 
+        public void Save(string FriendlyName, string FileName, bool Overwrite)
+        {
+            int index = IndicatorContainsFriendlyName(FriendlyName);
+            if (index != -1)
+            {
+                TabPage IndicatorPage = IndicatorDictionary.Values.ToList<TabPage>()[index];
+                CommunicationIndicator Indicator = (CommunicationIndicator)IndicatorPage.Controls[0];
+                Indicator.Save(FileName, Overwrite);
+            }
+        }
     }
 }
