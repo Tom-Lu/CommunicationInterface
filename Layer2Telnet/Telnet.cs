@@ -47,6 +47,7 @@ namespace Layer2Telnet
         private MacAddress _remote_mac;
         private ushort _remote_port;
         private bool _response_telnet_ctrl = false;
+        private bool GoAhead = false;
 
         private TCP_STATE _current_state = TCP_STATE.CLOSED;
         private uint _current_sequence_number = 0;
@@ -555,6 +556,13 @@ namespace Layer2Telnet
                 switch (data)
                 {
                     case -1:
+                        {
+                            if (!GoAhead)
+                            {
+                                Write(new byte[] { (byte)TELNET_CMD.IAC, (byte)TELNET_CMD.DO, (byte)TELNET_OPT.SGA });
+                                GoAhead = true;
+                            }
+                        }
                         break;
                     case (int)TELNET_CMD.IAC:
                         {

@@ -16,6 +16,7 @@ namespace Communication.Interface.Implementation
         private IPEndPoint ip_end_point = null;
         private TcpClient tcp_client = null;
         private NetworkStream stream = null;
+        private bool GoAhead = false;
 
         public Telnet(string IpAddress, int Port) : base()
         {
@@ -117,7 +118,7 @@ namespace Communication.Interface.Implementation
             read_buffer.Clear();
             int data = -1;
             int cmd = -1;
-            int option = -1;
+            TELNET_OPT option;
             int previous_data = -1;
             int previous_data2 = -1;
 
@@ -130,50 +131,44 @@ namespace Communication.Interface.Implementation
                 switch (data)
                 {
                     case -1:
+                        {
+                            if (!GoAhead)
+                            {
+                                Write(new byte[] {(byte)TELNET_CMD.IAC, (byte)TELNET_CMD.DO, (byte)TELNET_OPT.SGA});
+                                GoAhead = true;
+                            }
+                        }
                         break;
                     case (int)TELNET_CMD.IAC:
                         {
                             cmd = ReadByte();
-                            // File.AppendAllText("d:\\telnet.txt", string.Format("-> IAC: 0x{0:X2}\r\n", cmd));
                             if (cmd == -1) break;
 
                             switch ((TELNET_CMD)cmd)
                             {
                                 case TELNET_CMD.IAC:   // data 0xFF
                                         read_buffer.Append((byte)cmd);
-                                        // File.AppendAllText("d:\\telnet.txt", "IAC: IAC\r\n");
                                     break;
                                 case TELNET_CMD.DO:
                                     {
-                                        option = ReadByte();
-                                        // File.AppendAllText("d:\\telnet.txt", string.Format("-> IAC: DO: 0x{0:X2}\r\n", option));
-                                        // Refuse all request
-                                        Write((byte)TELNET_CMD.IAC);
-                                        Write((byte)TELNET_CMD.DONT);
-                                        Write((byte)option);
-                                        File.AppendAllText("d:\\telnet.txt", string.Format("<- IAC: DO: 0x{0:X2}\r\n", option));
+                                        option = (TELNET_OPT)ReadByte();
+                                        Write(new byte[] {(byte)TELNET_CMD.IAC, (byte)TELNET_CMD.WONT, (byte)option});
                                         break;
                                     }
                                 case TELNET_CMD.DONT:
                                     {
-                                        option = ReadByte(); //  Yes, I hear you.
-                                        // File.AppendAllText("d:\\telnet.txt", string.Format("-> IAC: DONT: 0x{0:X2}\r\n", option));
+                                        option = (TELNET_OPT)ReadByte(); //  Yes, I hear you.
                                         break;
                                     }
                                 case TELNET_CMD.WILL:
                                     {
-                                        option = ReadByte();
-                                        // File.AppendAllText("d:\\telnet.txt", string.Format("-> IAC: WILL: 0x{0:X2}\r\n", option));
-                                        Write((byte)TELNET_CMD.IAC);
-                                        Write((byte)TELNET_CMD.WONT);
-                                        Write((byte)option);
-                                        // File.AppendAllText("d:\\telnet.txt", string.Format("<- IAC: DO: 0x{0:X2}\r\n", option));
+                                        option = (TELNET_OPT)ReadByte();
+                                        Write(new byte[] {(byte)TELNET_CMD.IAC, (byte)TELNET_CMD.DO, (byte)option});
                                         break;
                                     }
                                 case TELNET_CMD.WONT:
                                     {
-                                        option = ReadByte(); //  Yes, I hear you.
-                                        // File.AppendAllText("d:\\telnet.txt", string.Format("-> IAC: WONT: 0x{0:X2}\r\n", option));
+                                        option = (TELNET_OPT)ReadByte(); //  Yes, I hear you.
                                         break;
                                     }
                                 default:
@@ -212,7 +207,7 @@ namespace Communication.Interface.Implementation
             return read_buffer.ToString();
         }
 
-        internal enum TELNET_CMD
+        internal enum TELNET_CMD : byte
         {
             XEOF = 236,         // End of file
             SUSP = 237,         // Suspend process
@@ -236,7 +231,7 @@ namespace Communication.Interface.Implementation
             IAC = 255           // Data Byte 255.
         }
 
-        internal enum TELNET_OPT
+        internal enum TELNET_OPT : byte
         {
             BINARY = 0,             // 8-bit data path
             ECHO = 1,               // echo

@@ -14,16 +14,9 @@ namespace Layer2Net
 {
     public class ArpService
     {
-        public enum ARP_STATE
-        {
-            IDLE,
-            WAIT_REPLY,
-        }
-
         private const int ARP_RESOLVE_TIMEOUT = 3000;
         private VirtualAdapter _adapter;
         private Dictionary<IpV4Address, MacAddress> _arp_table;
-        private ARP_STATE _current_state = ARP_STATE.IDLE;
         private IpV4Address _current_arp_probe_target_ip;
         private MacAddress _current_arp_replay_target_mac;
         private ManualResetEvent _arp_resolve_wait_handle = new ManualResetEvent(false);
@@ -201,7 +194,6 @@ namespace Layer2Net
             _arp_resolve_wait_handle.Reset();
             _current_arp_probe_target_ip = TargetIP;
             SendProbe(TargetIP);
-            _current_state = ARP_STATE.WAIT_REPLY;
 
             if (_arp_resolve_wait_handle.WaitOne(ARP_RESOLVE_TIMEOUT))
             {
@@ -214,7 +206,6 @@ namespace Layer2Net
                 VirtualNetwork.Instance.PostTraceMessage("ARP Resolve: " + TargetIP.ToString() + " - FAILED");
             }
 
-            _current_state = ARP_STATE.IDLE;
             return ResolveResult;
         }
 
