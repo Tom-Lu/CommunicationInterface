@@ -46,7 +46,7 @@ namespace Layer2Telnet
         private IpV4Address _remote_ip;
         private MacAddress _remote_mac;
         private ushort _remote_port;
-        private bool _response_telnet_ctrl = false;
+        private bool _response_telnet_ctrl = true;
         private bool GoAhead = false;
 
         private TCP_STATE _current_state = TCP_STATE.CLOSED;
@@ -579,8 +579,7 @@ namespace Layer2Telnet
                                         option = ReadByte();
                                         if (_response_telnet_ctrl)
                                         {
-                                            // Refuse all request
-                                            Write(new byte[] { (byte)TELNET_CMD.IAC, (byte)TELNET_CMD.DONT, (byte)option });
+                                            Write(new byte[] { (byte)TELNET_CMD.IAC, (byte)TELNET_CMD.WONT, (byte)option });
                                         }
                                         break;
                                     }
@@ -594,7 +593,7 @@ namespace Layer2Telnet
                                         option = ReadByte();
                                         if (_response_telnet_ctrl)
                                         {
-                                            Write(new byte[] { (byte)TELNET_CMD.IAC, (byte)TELNET_CMD.WONT, (byte)option });
+                                            Write(new byte[] { (byte)TELNET_CMD.IAC, (byte)TELNET_CMD.DO, (byte)option });
                                         }
                                         break;
                                     }
