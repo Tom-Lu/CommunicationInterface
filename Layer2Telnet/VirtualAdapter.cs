@@ -193,13 +193,6 @@ namespace Layer2Net
             return Successful;
         }
 
-        public TcpSession NewTcpSession(string RemoteIP, string RemoteMac, ushort RemotePort)
-        {
-            _arp_service.SendProbe(new IpV4Address(RemoteIP));
-            System.Threading.Thread.Sleep(100);
-            return _tcp_service.NewSession(RemoteIP, RemoteMac, RemotePort);
-        }
-
         public void PacketProcess(Packet packet)
         {
             switch (packet.Ethernet.EtherType)

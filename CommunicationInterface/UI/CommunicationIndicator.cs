@@ -18,7 +18,6 @@ namespace Communication.Interface.UI
     public partial class CommunicationIndicator : UserControl
     {
         private bool _ToolbarVisible = true;
-        private NamedPipeServerStream IndicatorPipe = null;
         private ICommunicationInterface CommunicationInterface = null;
         private AppendTextEventDelegate AppendTextEventHandler = null;
         private System.Threading.Timer BackgroundReadTimer = null;

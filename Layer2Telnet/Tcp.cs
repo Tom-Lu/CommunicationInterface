@@ -1,18 +1,24 @@
-ï»¿using System;
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
+using System.Collections;
+using System.Net;
+using System.Net.Sockets;
 using System.IO;
 using System.Threading;
 using PcapDotNet.Packets.IpV4;
 using PcapDotNet.Packets.Ethernet;
 using PcapDotNet.Packets.Transport;
 using PcapDotNet.Packets;
-using System.Diagnostics;
+using Communication.Interface;
+using Communication.Interface.Implementation;
+using Layer2Net;
 
-namespace Layer2Net
+
+namespace Layer2Telnet
 {
-    public class TcpSession : ITcpSession
+    [InterfaceImplementation(Name = "L2Tcp", Scheme = "L2Tcp", ConfigPanel = null)]
+    public class Tcp : AbsCommunicationInterface, ITcpSession
     {
         private enum TCP_STATE
         {
@@ -28,9 +34,12 @@ namespace Layer2Net
             CLOSING,
             TIME_WAIT
         }
-        public delegate void TcpDataAvailableHandler(MemoryStream buffer);
+        private static VirtualNetwork Network = null;
 
-        private const ushort CONNECTION_TIMEOUT = 5000;
+        private const ushort CONNECTION_TIMEOUT = 20000;
+        private const ushort DISCONNECT_TIMEOUT = 2000;
+        private const ushort TCP_OPEN_TIMEOUT = 1000;
+        private const ushort KEEP_ALIVE_PERIOD = 500;
         private TcpService _service = null;
         private VirtualAdapter _adapter = null;
         private ushort _local_port;
@@ -43,10 +52,45 @@ namespace Layer2Net
         private uint _last_acknowledgment_number = 0;
         private ushort _local_tcp_window_size = 65535;
         private ushort _remote_tcp_window_size = 0;
+        private DateTime _last_read_available_time = DateTime.Now;
         private ManualResetEvent _connection_wait_handle = new ManualResetEvent(false);
-        private MemoryStream _input_buffer = null;
+        private Queue<byte> InputBuffer;
+        private object InputBufferLocker = new Object();
+        private VirtualAdapter Adapter = null;
 
-        public event TcpDataAvailableHandler TcpDataHandler;
+        public Tcp(string ConfigString, string FriendlyName) : base(ConfigString, FriendlyName)
+        {
+            // L2Tcp:IP=192.168.1.1, Port=23, Adapter=SOCKET_1, ConfigFile=Config\\TEST_NET.network
+            if (Network == null)
+            {
+                string NetworkConfigFile = Config["ConfigFile"];
+                Network = VirtualNetwork.Load(NetworkConfigFile);
+                Network.Start();
+            }
+            else
+            {
+                if (!Network.IsRunning)
+                {
+                    Network.Start();
+                }
+            }
+
+            Adapter = Network.GetAdapterByName(Config["Adapter"]);
+            Adapter.BoardcastLocalAddress();
+            this._service = Adapter.TcpService;
+            this._adapter = Adapter;
+            this._local_port = this._service.GetAvailableLocalPort();
+            this._remote_ip = new IpV4Address(Config["IP"]);
+            this._remote_port = ushort.Parse(Config["Port"]);
+
+            if (Config.ContainsKey("MAC") && !string.IsNullOrEmpty(Config["MAC"]))
+            {
+                this._remote_mac = new MacAddress(Config["MAC"]);
+            }
+
+            _current_state = TCP_STATE.CLOSED;
+            this._service.AddSession(this);
+        }
 
         public string Name
         {
@@ -80,25 +124,49 @@ namespace Layer2Net
             }
         }
 
-        public TcpSession(TcpService Service, VirtualAdapter Adapter, ushort LocalPort, IpV4Address RemoteIP, MacAddress RemoteMac, ushort RemotePort)
+        override public bool IsOpened
         {
-            this._service = Service;
-            this._adapter = Adapter;
-            this._local_port = LocalPort;
-            this._remote_ip = RemoteIP;
-            this._remote_mac = RemoteMac;
-            this._remote_port = RemotePort;
-            _current_state = TCP_STATE.CLOSED;
+            get
+            {
+                try
+                {
+                    return IsOpen;
+                }
+                catch
+                {
+                    return false;
+                }
+            }
         }
 
-        public void Open()
+        override public void Open()
+        {
+            string MACString = string.Empty;
+            if (_adapter.ArpService.Resolve(_remote_ip.ToString(), out MACString))
+            {
+                this._remote_mac = new MacAddress(MACString);
+            }
+            else
+            {
+                throw new Exception("Unable resolve mac for remote host: " + _remote_ip.ToString());
+            }
+            DateTime StartTime = DateTime.Now;
+            TimeSpan ConnectionTime = TimeSpan.Zero;
+            while (!IsOpen && ConnectionTime.TotalMilliseconds < CONNECTION_TIMEOUT)
+            {
+                TcpOpen();
+                ConnectionTime = DateTime.Now - StartTime;
+            } 
+        }
+
+        private void TcpOpen()
         {
             VirtualNetwork.Instance.PostTraceMessage("TCP OPEN: " + _remote_ip.ToString() + " " + _remote_port.ToString());
-            _input_buffer = new MemoryStream(4096);
+            InputBuffer = new Queue<byte>();
             _connection_wait_handle.Reset();
             SendTcpCtrlPacket(0, TcpControlBits.Synchronize);    // ACK = false, SYNC = true, FIN = false
             _current_state = TCP_STATE.SYN_SENT;
-            _connection_wait_handle.WaitOne(CONNECTION_TIMEOUT, true); // wait for connection process finish
+            _connection_wait_handle.WaitOne(TCP_OPEN_TIMEOUT, true); // wait for connection process finish
             if (_current_state == TCP_STATE.ESTABLISHED)
             {
                 VirtualNetwork.Instance.PostTraceMessage("TCP OPEN: " + _remote_ip.ToString() + " " + _remote_port.ToString() + " - SUCCESSFUL");
@@ -109,7 +177,7 @@ namespace Layer2Net
             }
         }
 
-        public void Close()
+        override public void Close()
         {
             if (IsOpen)
             {
@@ -117,7 +185,7 @@ namespace Layer2Net
                 _connection_wait_handle.Reset();
                 SendTcpCtrlPacket(_last_acknowledgment_number, TcpControlBits.Fin | TcpControlBits.Acknowledgment);
                 _current_state = TCP_STATE.FIN_WAIT_1;
-                _connection_wait_handle.WaitOne(CONNECTION_TIMEOUT, true); // wait for connection process finish
+                _connection_wait_handle.WaitOne(DISCONNECT_TIMEOUT, true); // wait for connection process finish
 
                 if (_current_state == TCP_STATE.CLOSED)
                 {
@@ -127,6 +195,57 @@ namespace Layer2Net
                 {
                     VirtualNetwork.Instance.PostTraceMessage("TCP CLOSE: " + _remote_ip.ToString() + " " + _remote_port.ToString() + " - FAILED");
                 }
+            }
+        }
+
+        override public void Flush()
+        {
+            return;
+        }
+
+        override public int ReadByte()
+        {
+            int data = -1;
+
+            if (InputBuffer.Count > 0)
+            {
+                lock (InputBufferLocker)
+                {
+                    if (InputBuffer.Count > 0)
+                    {
+                        data = InputBuffer.Dequeue();
+                    }
+                }
+                _last_read_available_time = DateTime.Now;
+            }
+            else
+            {
+                if (IsOpen)
+                {
+                    if ((DateTime.Now - _last_read_available_time).TotalMilliseconds >= KEEP_ALIVE_PERIOD)
+                    {
+                        _adapter.ArpService.SendGratuitus();
+                        _last_read_available_time = DateTime.Now;
+                    }
+                }
+            }
+
+            return data;
+        }
+
+        override public void Write(byte data)
+        {
+            if (IsOpen)
+            {
+                SendPacket(new byte[] { data });
+            }
+        }
+
+        override public void Write(byte[] data)
+        {
+            if (IsOpen)
+            {
+                SendPacket(data);
             }
         }
 
@@ -148,14 +267,14 @@ namespace Layer2Net
                 {
                     SendTcpCtrlPacket(tcp.SequenceNumber + 1, TcpControlBits.Reset | TcpControlBits.Acknowledgment);
                 }
-                else if (_current_state == TCP_STATE.SYN_SENT && SYN && ACK)  // è¿œç¨‹ä¸»æœºå“åº”è¿žæŽ¥è¯·æ±‚
+                else if (_current_state == TCP_STATE.SYN_SENT && SYN && ACK)  // Ô¶³ÌÖ÷»úÏìÓ¦Á¬½ÓÇëÇó
                 {
                     SendTcpCtrlPacket(tcp.SequenceNumber + 1, TcpControlBits.Acknowledgment);
                     _current_state = TCP_STATE.ESTABLISHED;
                     _connection_wait_handle.Set();
                     _service.TriggerSessionStateChange(this);
                 }
-                else if (FIN) // è¿žæŽ¥è¢«å°†è¦æ–­å¼€
+                else if (FIN) // Á¬½Ó±»½«Òª¶Ï¿ª
                 {
                     if (_current_state == TCP_STATE.ESTABLISHED)
                     {
@@ -185,19 +304,38 @@ namespace Layer2Net
                     SendTcpCtrlPacket(_last_acknowledgment_number, TcpControlBits.Reset);
                     _current_state = TCP_STATE.CLOSED;
                 }
-                else if (RST) // è¿žæŽ¥è¢«é‡ç½®
+                else if (_current_state == TCP_STATE.ESTABLISHED && RST) // Á¬½Ó±»ÖØÖÃ
                 {
                     _current_state = TCP_STATE.CLOSED;
                 }
-                else if (PSH)   // éœ€å¤„ç†ä¼ è¾“æ•°æ®
+                else if (PSH)   // Ðè´¦Àí´«ÊäÊý¾Ý
                 {
-                    tcp.Payload.ToMemoryStream().WriteTo(_input_buffer);
-                    if (TcpDataHandler != null)
+                    if (tcp.SequenceNumber == _last_acknowledgment_number)
                     {
-                        TcpDataHandler(tcp.Payload.ToMemoryStream());
-                    }
+                        try
+                        {
+                            StreamReader PayloadStream = new StreamReader(tcp.Payload.ToMemoryStream(), Encoding.ASCII);
+                            lock (InputBufferLocker)
+                            {
+                                int data = -1;
+                                do
+                                {
+                                    data = PayloadStream.Read();
+                                    if(data != -1)
+                                    {
+                                        InputBuffer.Enqueue((byte)data);
+                                    }
 
-                    SendTcpCtrlPacket(tcp.SequenceNumber + (uint)tcp.PayloadLength, TcpControlBits.Acknowledgment);
+                                }while(data != -1);
+                            }
+
+                            SendTcpCtrlPacket(tcp.SequenceNumber + (uint)tcp.PayloadLength, TcpControlBits.Acknowledgment);
+                        } catch {}
+                    }
+                    else if (ACK && tcp.SequenceNumber == _last_acknowledgment_number - 1)  // Keep Alive
+                    {
+                        SendTcpCtrlPacket(_last_acknowledgment_number, TcpControlBits.Acknowledgment);
+                    }
                 }
                 else if (ACK && _current_state == TCP_STATE.ESTABLISHED)
                 {
@@ -296,6 +434,7 @@ namespace Layer2Net
 
         public void SendPacket(byte[] data)
         {
+            Packet packet = null;
             EthernetLayer ethernetLayer =
                 new EthernetLayer
                 {
@@ -374,7 +513,7 @@ namespace Layer2Net
 
                     if (_adapter.VLAN > 1)
                     {
-                        VirtualNetwork.Instance.SendPacket(PacketBuilder.Build(DateTime.Now, ethernetLayer, vlanLayer, ipV4Layer, tcpLayer, payloadLayer));
+                        packet = PacketBuilder.Build(DateTime.Now, ethernetLayer, vlanLayer, ipV4Layer, tcpLayer, payloadLayer);
                     }
                     else
                     {
@@ -393,10 +532,45 @@ namespace Layer2Net
                 }
                 else
                 {
-                    VirtualNetwork.Instance.SendPacket(PacketBuilder.Build(DateTime.Now, ethernetLayer, ipV4Layer, tcpLayer, payloadLayer));
+                    VirtualNetwork.Instance.SendPacket(PacketBuilder.Build(DateTime.Now, ethernetLayer, ipV4Layer, tcpLayer, payloadLayer));               
                 }
             }
         }
 
+        override public string ReadUntil(string StopFlag)
+        {
+            read_buffer.Clear();
+            int data = -1;
+            do
+            {
+                data = ReadByte();
+
+                if (data != -1)
+                {
+                    read_buffer.Append((byte)data);
+                }
+
+                if (StopFlag != null && !StopFlag.Equals(string.Empty))
+                {
+                    if (((IBuffer)read_buffer).Contains(StopFlag))
+                    {
+                        break;
+                    }
+                }
+
+            } while (data != -1);
+
+            if (!read_buffer.IsEmpty())
+            {
+                global_buffer.Append((IBufferInternal)read_buffer);
+                if (fragment_buffer_record)
+                {
+                    fragment_buffer.Append((IBufferInternal)read_buffer);
+                }
+
+                TriggerBufferUpdateEvent(read_buffer);
+            }
+            return read_buffer.ToString();
+        }
     }
 }

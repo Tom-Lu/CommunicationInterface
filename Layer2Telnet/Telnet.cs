@@ -62,7 +62,7 @@ namespace Layer2Telnet
 
         public Telnet(string ConfigString, string FriendlyName) : base(ConfigString, FriendlyName)
         {
-            // ConfigFile=test\\test.cfg, Adapter=ADAPTER1, IP=192.168.1.100, MAC=00:00:00:00:00:00, Port=23
+            // L2Telnet:IP=192.168.1.1, Port=23, Adapter=SOCKET_1, ConfigFile=Config\\TEST_NET.network
             if (Network == null)
             {
                 string NetworkConfigFile = Config["ConfigFile"];

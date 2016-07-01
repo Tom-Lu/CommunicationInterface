@@ -23,26 +23,6 @@ namespace Layer2Net
             this._tcp_sessions = new Hashtable();
         }
 
-        public TcpSession NewSession(string RemoteIP, string RemoteMac, ushort RemotePort)
-        {
-            ushort LocalPort = GetAvailableLocalPort();
-            uint SessionHashCode = UtilityLib.GetTcpSessionHashCode(_adapter.IP, LocalPort, new IpV4Address(RemoteIP), RemotePort);
-
-            if (_tcp_sessions.ContainsKey(SessionHashCode))
-            {
-                return (TcpSession)_tcp_sessions[SessionHashCode];
-            }
-            else
-            {
-                TcpSession session = new TcpSession(this, _adapter, LocalPort, new IpV4Address(RemoteIP), new MacAddress(RemoteMac), RemotePort);
-                if (!_tcp_sessions.ContainsKey(session.HashCode))
-                {
-                    _tcp_sessions.Add(session.HashCode, session);
-                }
-                return session;
-            }
-        }
-
         internal ushort GetAvailableLocalPort()
         {
             ushort Port = 0;
@@ -106,9 +86,9 @@ namespace Layer2Net
             }
         }
 
-        public TcpSession[] GetSessions()
+        public ITcpSession[] GetSessions()
         {
-            return _tcp_sessions.Values.ToArray<TcpSession>();
+            return _tcp_sessions.Values.ToArray<ITcpSession>();
         }
 
         public void ProcessTCP(IpV4Datagram packet)
