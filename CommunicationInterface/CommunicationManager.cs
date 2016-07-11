@@ -16,8 +16,8 @@ namespace Communication.Interface
     /// </summary>
     public class CommunicationManager
     {
-        private volatile static CommunicationViewer Viewer = null;
         private static readonly object locker = new object();
+        private static CommunicationViewer viewer = null;
 
         /// <summary>
         /// Query communication interface implementation from external assembly which locat in current assembly directory.
@@ -121,24 +121,8 @@ namespace Communication.Interface
             if (Implementation != null)
             {
                 CommunicationInterface = Implementation.Instance(ConnectionString.Substring(Scheme.Length+1), FriendlyName);
-                if (CommunicationInterface != null)
-                {
-                    GetCommunicationViewer().AttachInterface(CommunicationInterface, ClearPrevious);
-                }
             }
             return CommunicationInterface;
-        }
-
-        /// <summary>
-        ///  Deattach communication interface from communication viewer
-        /// </summary>
-        /// <param name="CommunicationInterface">Communication interface</param>
-        public static void DeattachInterface(ICommunicationInterface CommunicationInterface)
-        {
-            if (CommunicationInterface != null)
-            {
-                GetCommunicationViewer().DeattachInterface(CommunicationInterface);
-            }
         }
 
         /// <summary>
@@ -155,62 +139,39 @@ namespace Communication.Interface
             return string.Empty;
         }
 
-        /// <summary>
-        /// Get communiction viewer instance
-        /// </summary>
-        /// <returns>communiction viewer instance</returns>
-        public static CommunicationViewer GetCommunicationViewer()
+        public static CommunicationViewer GetViewer()
         {
-            if (Viewer == null)
+            if (viewer == null)
             {
-                InitCommunicationViewer();
+                InitViewer(DockType.None);
             }
-            return Viewer;
+
+            return viewer;
         }
 
-        /// <summary>
-        /// Initial communiction viewer
-        /// </summary>
-        /// <returns>communiction viewer instance</returns>
-        public static CommunicationViewer InitCommunicationViewer()
+        public static CommunicationViewer InitViewer()
         {
-            return InitCommunicationViewer(DockType.None);
+            return InitViewer(DockType.None);
         }
 
-        /// <summary>
-        /// Initial communiction viewer
-        /// </summary>
-        /// <param name="Dock">Specifies the position which communication viewer will dock to.</param>
-        /// <returns>communiction viewer instance</returns>
-        public static CommunicationViewer InitCommunicationViewer(DockType Dock)
+        public static CommunicationViewer InitViewer(UI.DockType DockType)
         {
-            if (Viewer == null)
+            if (viewer == null)
             {
-                lock (locker)
-                {
-                    if (Viewer == null)
-                    {
-                        Viewer = new CommunicationViewer(Dock);
-                    }
-                }
+                viewer = new CommunicationViewer();
             }
-            return Viewer;
+
+            return viewer;
         }
 
-        /// <summary>
-        /// Show the communicaiton viewer dialog
-        /// </summary>
-        public static void ShowCommunicationViewer()
+        public static void ShowViewer()
         {
-            GetCommunicationViewer().ShowViewer();
+            GetViewer().Show();
         }
 
-        /// <summary>
-        /// Hide the communicaiton viewer dialog
-        /// </summary>
-        public static void HideCommunicationViewer()
+        public static void HideViewer()
         {
-            GetCommunicationViewer().HideViewer();
+            GetViewer().Hide();
         }
 
         /// <summary>
@@ -218,12 +179,6 @@ namespace Communication.Interface
         /// </summary>
         public static void Cleanup()
         {
-            if (Viewer != null)
-            {
-                Viewer.HideViewer();
-                Viewer.Release();
-                Viewer = null;
-            }
         } 
     }
 }

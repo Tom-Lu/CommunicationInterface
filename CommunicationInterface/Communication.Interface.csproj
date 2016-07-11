@@ -36,26 +36,16 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Implementation\PlinkTelnet.cs" />
     <Compile Include="Implementation\Tcp.cs" />
     <Compile Include="Interop\Win32Window.cs" />
-    <Compile Include="UI\CommunicationViewer.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="UI\CommunicationViewer.Designer.cs">
-      <DependentUpon>CommunicationViewer.cs</DependentUpon>
-    </Compile>
-    <Compile Include="UI\CommunicationIndicator.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="UI\CommunicationIndicator.Designer.cs">
-      <DependentUpon>CommunicationIndicator.cs</DependentUpon>
-    </Compile>
     <Compile Include="UI\BufferPanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -109,16 +99,22 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="UI\CommunicationChannel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UI\CommunicationChannel.Designer.cs">
+      <DependentUpon>CommunicationChannel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UI\CommunicationViewer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\CommunicationViewer.Designer.cs">
+      <DependentUpon>CommunicationViewer.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="UI\CommunicationViewer.resx">
-      <DependentUpon>CommunicationViewer.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="UI\CommunicationBuilder.resx">
       <DependentUpon>CommunicationBuilder.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="UI\CommunicationIndicator.resx">
-      <DependentUpon>CommunicationIndicator.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\BufferPanel.resx">
       <DependentUpon>BufferPanel.cs</DependentUpon>
@@ -135,6 +131,12 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\CommunicationChannel.resx">
+      <DependentUpon>CommunicationChannel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\CommunicationViewer.resx">
+      <DependentUpon>CommunicationViewer.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

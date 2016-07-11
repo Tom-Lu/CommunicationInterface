@@ -18,7 +18,7 @@ namespace CommLauncher
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            CommunicationManager.InitCommunicationViewer();
+            CommunicationManager.InitViewer();
             string ConnString = CommunicationManager.ShowCommunicationBuilder();
 
             if (!string.IsNullOrEmpty(ConnString))
@@ -29,7 +29,7 @@ namespace CommLauncher
                     CommInterface.Open();
                     if (CommInterface.IsOpened)
                     {
-                        Application.Run(CommunicationManager.GetCommunicationViewer());
+                        Application.Run(CommunicationManager.GetViewer());
                     }
                 }
                 catch (Exception e)

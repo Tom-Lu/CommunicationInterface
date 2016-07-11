@@ -21,8 +21,8 @@ namespace Communication.Interface.Test
 
             // L2Telnet:ConfigFile=WAW-1P.network, Adapter=UUT SOCKET 1, LocalPort=8090, RemoteIP=192.168.1.100, RemoteMAC=00:00:00:00:00:00, RemotePort=23
 
-            CommunicationManager.InitCommunicationViewer(UI.DockType.Right);
-            CommunicationManager.ShowCommunicationViewer();
+            CommunicationManager.InitViewer(UI.DockType.Right);
+            CommunicationManager.ShowViewer();
             //ICommunicationInterface CommInterface = CommunicationManager.InstanceInterface("L2Telnet:IP=192.168.1.1, Port=23, Adapter=SOCKET_1, ConfigFile=WAW-1P.network", "Zhone OLT");
             ICommunicationInterface CommInterface = CommunicationManager.InstanceInterface("Telnet:IP=192.168.1.1,Port=23", "HGU");
 
@@ -32,7 +32,7 @@ namespace Communication.Interface.Test
             CommInterface.Open();
             if (CommInterface.IsOpened)
             {
-                CommunicationManager.GetCommunicationViewer().AddDisplayFilter("\n\r", "\r\n");
+                CommunicationManager.GetViewer().AddDisplayFilter("\n\r", "\r\n");
                 CommInterface.Timeout = 10;
                 CommInterface.LineFeed = "\r\n";
 
@@ -41,7 +41,7 @@ namespace Communication.Interface.Test
                 {
                     Console.WriteLine("Cannot capture login message!");
                 }
-                CommunicationManager.GetCommunicationViewer().Save(CommInterface.FriendlyName, "d:\\testlog.txt", true);
+                // CommunicationManager.GetViewer().Save(CommInterface.FriendlyName, "d:\\testlog.txt", true);
                 CommInterface.WriteLine("telnetadmin");
                 CommInterface.WaitForString("Password:", 10);
                 CommInterface.WriteLine("telnetadmin");
@@ -58,7 +58,7 @@ namespace Communication.Interface.Test
             // Close communication interface
             CommInterface.Close();
             CommInterface = null;
-            CommunicationManager.HideCommunicationViewer();
+            CommunicationManager.HideViewer();
             CommunicationManager.Cleanup();
         }
 
