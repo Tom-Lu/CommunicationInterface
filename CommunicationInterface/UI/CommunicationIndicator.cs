@@ -20,6 +20,12 @@ namespace Communication.Interface.UI
         private bool _ToolbarVisible = true;
         private ICommunicationInterface CommunicationInterface = null;
         private AppendTextEventDelegate AppendTextEventHandler = null;
+        private object _TextBufferLocker = new object();
+        private MemoryStream _TextBuffer = null;
+        private TextReader _TextBufferReader = null;
+        private TextWriter _TextBufferWriter = null;
+        private DateTime _LastUpdateTimeStamp = DateTime.Now;
+        private TimeSpan _UpdateTimeSpan = new TimeSpan(100*TimeSpan.TicksPerMillisecond);
         private System.Threading.Timer BackgroundReadTimer = null;
         private int SecretCounter = 0;
 
@@ -63,15 +69,15 @@ namespace Communication.Interface.UI
         {
             InitializeComponent();
             AppendTextEventHandler = new AppendTextEventDelegate(AppendTextEventProxy);
+            _TextBuffer = new MemoryStream();
+            _TextBufferReader = new StreamReader(_TextBuffer);
+            _TextBufferWriter = new StreamWriter(_TextBuffer);
             ToolbarVisible = true;
         }
 
         public CommunicationIndicator(ICommunicationInterface CommunicationInterface)
             : this()
         {
-            //IndicatorPipe = new NamedPipeServerStream(CommunicationInterface.FriendlyName, PipeDirection.In);
-            //IndicatorPipe.ReadMode = PipeTransmissionMode.Byte;
-
             this.CommunicationInterface = CommunicationInterface;
             this.CommunicationInterface.BufferUpdatedHandler += new OnBufferUpdatedEvent(CommInterface_OnBufferUpdatedHandler);
             this.CommunicationInterface.WriteEventHandler += new OnWriteEvent(CommInterface_WriteEventHandler);
@@ -94,7 +100,27 @@ namespace Communication.Interface.UI
 
         void CommInterface_OnBufferUpdatedHandler(string Buffer)
         {
-            AppendTextEventProxy(Buffer, Color.White);
+            lock (_TextBufferLocker)
+            {
+                if ((DateTime.Now - _LastUpdateTimeStamp).TotalMilliseconds < _UpdateTimeSpan.TotalMilliseconds)
+                {
+                    _TextBufferWriter.Write(Buffer);
+                }
+                else
+                {
+                    if (_TextBuffer.Length > 0)
+                    {
+                        _TextBufferWriter.Write(Buffer);
+                        AppendTextEventProxy(_TextBufferReader.ReadToEnd(), Color.White);
+                        _TextBuffer.SetLength(0);
+                        _TextBuffer.Seek(0, SeekOrigin.Begin);
+                    }
+                    else
+                    {
+                        AppendTextEventProxy(Buffer, Color.White);
+                    }
+                }
+            }
         }
 
         void CommInterface_WriteEventHandler(string Buffer)
@@ -134,6 +160,7 @@ namespace Communication.Interface.UI
         delegate void AppendTextEventDelegate(string text, Color color);
         public void AppendTextEventProxy(string text, Color color)
         {
+            _LastUpdateTimeStamp = DateTime.Now;
             if (this.InvokeRequired)
             {
                 this.BeginInvoke(AppendTextEventHandler, new object[] { text, color });

@@ -24,7 +24,7 @@ namespace Communication.Interface.Test
             CommunicationManager.InitCommunicationViewer(UI.DockType.Right);
             CommunicationManager.ShowCommunicationViewer();
             //ICommunicationInterface CommInterface = CommunicationManager.InstanceInterface("L2Telnet:IP=192.168.1.1, Port=23, Adapter=SOCKET_1, ConfigFile=WAW-1P.network", "Zhone OLT");
-            ICommunicationInterface CommInterface = CommunicationManager.InstanceInterface("Telnet:IP=1.2.3.4,Port=23", "Zhone OLT");
+            ICommunicationInterface CommInterface = CommunicationManager.InstanceInterface("Telnet:IP=192.168.1.1,Port=23", "HGU");
 
             // Buffer update event handler for console applicaiton, for WinForm applicaiton you should use ShowCommunicationViewer to display the trace window
             CommInterface.BufferUpdatedHandler += new OnBufferUpdatedEvent(CommInterface_BufferUpdatedHandler);
@@ -42,9 +42,9 @@ namespace Communication.Interface.Test
                     Console.WriteLine("Cannot capture login message!");
                 }
                 CommunicationManager.GetCommunicationViewer().Save(CommInterface.FriendlyName, "d:\\testlog.txt", true);
-                CommInterface.WriteLine("admin");
+                CommInterface.WriteLine("telnetadmin");
                 CommInterface.WaitForString("Password:", 10);
-                CommInterface.WriteLine("zhone");
+                CommInterface.WriteLine("telnetadmin");
                 CommInterface.WaitForString(">", 5);
 
                 CommInterface.StopToken = ">";
