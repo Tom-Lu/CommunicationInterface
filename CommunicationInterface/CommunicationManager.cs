@@ -121,6 +121,10 @@ namespace Communication.Interface
             if (Implementation != null)
             {
                 CommunicationInterface = Implementation.Instance(ConnectionString.Substring(Scheme.Length+1), FriendlyName);
+                if (CommunicationInterface != null && !string.IsNullOrEmpty(FriendlyName))
+                {
+                    GetViewer().AttachInterface(CommunicationInterface, ClearPrevious);
+                }
             }
             return CommunicationInterface;
         }
@@ -139,6 +143,15 @@ namespace Communication.Interface
             return string.Empty;
         }
 
+        /// <summary>
+        /// Get communiction viewer instance
+        /// </summary>
+        /// <returns>communiction viewer instance</returns>
+        public static CommunicationViewer GetCommunicationViewer()
+        {
+            return GetViewer();
+        }
+
         public static CommunicationViewer GetViewer()
         {
             if (viewer == null)
@@ -149,29 +162,64 @@ namespace Communication.Interface
             return viewer;
         }
 
+        /// <summary>
+        /// Initial communiction viewer
+        /// </summary>
+        /// <returns>communiction viewer instance</returns>
+        public static CommunicationViewer InitCommunicationViewer()
+        {
+            return InitViewer();
+        }
+
         public static CommunicationViewer InitViewer()
         {
             return InitViewer(DockType.None);
+        }
+
+                /// <summary>
+        /// Initial communiction viewer
+        /// </summary>
+        /// <param name="Dock">Specifies the position which communication viewer will dock to.</param>
+        /// <returns>communiction viewer instance</returns>
+        public static CommunicationViewer InitCommunicationViewer(DockType Dock)
+        {
+            return InitViewer(Dock);
         }
 
         public static CommunicationViewer InitViewer(UI.DockType DockType)
         {
             if (viewer == null)
             {
-                viewer = new CommunicationViewer();
+                viewer = new CommunicationViewer(DockType);
             }
 
             return viewer;
         }
 
+        /// <summary>
+        /// Show the communicaiton viewer dialog
+        /// </summary>
+        public static void ShowCommunicationViewer()
+        {
+            ShowViewer();
+        }
+
         public static void ShowViewer()
         {
-            GetViewer().Show();
+            GetViewer().ShowViewer();
+        }
+
+        /// <summary>
+        /// Hide the communicaiton viewer dialog
+        /// </summary>
+        public static void HideCommunicationViewer()
+        {
+            HideViewer();
         }
 
         public static void HideViewer()
         {
-            GetViewer().Hide();
+            GetViewer().HideViewer();
         }
 
         /// <summary>
@@ -179,6 +227,7 @@ namespace Communication.Interface
         /// </summary>
         public static void Cleanup()
         {
+            GetViewer().Release();
         } 
     }
 }

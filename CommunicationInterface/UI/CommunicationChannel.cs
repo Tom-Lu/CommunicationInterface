@@ -1,19 +1,43 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Data;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
 namespace Communication.Interface.UI
 {
-    public partial class CommunicationChannel : UserControl
+    public class CommunicationChannel : TabPage
     {
-        public CommunicationChannel()
+        private CommunicationIndicator indicator = null;
+        private string ChannelName = string.Empty;
+
+        private string Name 
         {
-            InitializeComponent();
+            get { return ChannelName; }
+            set { ChannelName = value; Text = ChannelName; }      
+        }
+
+        public CommunicationChannel() : this("", null)
+        {
+
+        }
+
+        public CommunicationChannel(string Name, Dictionary<string, string> Filters)
+        {
+            this.Name = Name;
+            indicator = new CommunicationIndicator(Filters);
+            indicator.Dock = DockStyle.Fill;
+            this.Controls.Add(indicator);
+        }
+
+        public void AttachInterface(ICommunicationInterface CommunicationInterface, bool ClearPrevious = true)
+        {
+            indicator.AttachInterface(CommunicationInterface, ClearPrevious);
+        }
+
+        public void DeattachInterface(ICommunicationInterface CommunicationInterface)
+        {
+            indicator.DeattachInterface(CommunicationInterface);
         }
     }
 }
