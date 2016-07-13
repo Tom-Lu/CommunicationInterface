@@ -6,8 +6,8 @@ using System.Text.RegularExpressions;
 
 namespace Communication.Interface
 {
-    public delegate void OnWriteEvent(string WriteBuffer);
-    public delegate void OnBufferUpdatedEvent(string ReadBuffer);
+    public delegate void OnWriteEvent(ICommunicationInterface CommunicationInterface, string WriteBuffer);
+    public delegate void OnBufferUpdatedEvent(ICommunicationInterface CommunicationInterface, string ReadBuffer);
 
     /// <summary>
     /// Communication interface defination

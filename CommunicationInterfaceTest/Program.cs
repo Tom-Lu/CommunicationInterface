@@ -62,7 +62,7 @@ namespace Communication.Interface.Test
             CommunicationManager.Cleanup();
         }
 
-        static void CommInterface_BufferUpdatedHandler(string Buffer)
+        static void CommInterface_BufferUpdatedHandler(ICommunicationInterface CommunicationInterface, string Buffer)
         {
             Console.Write(Buffer);
         }

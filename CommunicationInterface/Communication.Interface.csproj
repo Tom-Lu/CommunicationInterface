@@ -114,6 +114,7 @@
     <Compile Include="UI\CommunicationViewer.Designer.cs">
       <DependentUpon>CommunicationViewer.cs</DependentUpon>
     </Compile>
+    <Compile Include="UI\Utility.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="UI\CommunicationBuilder.resx">

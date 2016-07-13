@@ -30,23 +30,23 @@
         {
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.toolStripCopySelect = new System.Windows.Forms.ToolStripButton();
-            this.toolStripButton2 = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSave = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            this.toolStripButton3 = new System.Windows.Forms.ToolStripButton();
-            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
-            this.ConsoleText = new System.Windows.Forms.TextBox();
+            this.toolStripInteractiveCtrl = new System.Windows.Forms.ToolStripButton();
+            this.StatusBar = new System.Windows.Forms.StatusStrip();
             this.ConnectionString = new System.Windows.Forms.ToolStripStatusLabel();
+            this.ConsoleText = new System.Windows.Forms.TextBox();
             this.toolStrip1.SuspendLayout();
-            this.statusStrip1.SuspendLayout();
+            this.StatusBar.SuspendLayout();
             this.SuspendLayout();
             // 
             // toolStrip1
             // 
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripCopySelect,
-            this.toolStripButton2,
+            this.toolStripSave,
             this.toolStripSeparator1,
-            this.toolStripButton3});
+            this.toolStripInteractiveCtrl});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
             this.toolStrip1.Size = new System.Drawing.Size(473, 25);
@@ -61,39 +61,50 @@
             this.toolStripCopySelect.Name = "toolStripCopySelect";
             this.toolStripCopySelect.Size = new System.Drawing.Size(23, 22);
             this.toolStripCopySelect.Text = "Copy Select Content";
+            this.toolStripCopySelect.Click += new System.EventHandler(this.toolStripCopySelect_Click);
             // 
-            // toolStripButton2
+            // toolStripSave
             // 
-            this.toolStripButton2.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.toolStripButton2.Image = global::Communication.Interface.Properties.Resources.Save;
-            this.toolStripButton2.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripButton2.Name = "toolStripButton2";
-            this.toolStripButton2.Size = new System.Drawing.Size(23, 22);
-            this.toolStripButton2.Text = "Save Content";
+            this.toolStripSave.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.toolStripSave.Image = global::Communication.Interface.Properties.Resources.Save;
+            this.toolStripSave.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripSave.Name = "toolStripSave";
+            this.toolStripSave.Size = new System.Drawing.Size(23, 22);
+            this.toolStripSave.Text = "Save Content";
+            this.toolStripSave.Click += new System.EventHandler(this.toolStripSave_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
             this.toolStripSeparator1.Size = new System.Drawing.Size(6, 25);
             // 
-            // toolStripButton3
+            // toolStripInteractiveCtrl
             // 
-            this.toolStripButton3.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.toolStripButton3.Image = global::Communication.Interface.Properties.Resources.InputDisable;
-            this.toolStripButton3.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripButton3.Name = "toolStripButton3";
-            this.toolStripButton3.Size = new System.Drawing.Size(23, 22);
-            this.toolStripButton3.Text = "Enable Interactive Input";
+            this.toolStripInteractiveCtrl.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.toolStripInteractiveCtrl.Enabled = false;
+            this.toolStripInteractiveCtrl.Image = global::Communication.Interface.Properties.Resources.InputEnable;
+            this.toolStripInteractiveCtrl.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripInteractiveCtrl.Name = "toolStripInteractiveCtrl";
+            this.toolStripInteractiveCtrl.Size = new System.Drawing.Size(23, 22);
+            this.toolStripInteractiveCtrl.Text = "Enable Interactive Input";
+            this.toolStripInteractiveCtrl.Click += new System.EventHandler(this.toolStripInteractiveCtrl_Click);
             // 
-            // statusStrip1
+            // StatusBar
             // 
-            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.StatusBar.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.ConnectionString});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 64);
-            this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(473, 22);
-            this.statusStrip1.TabIndex = 1;
-            this.statusStrip1.Text = "statusStrip1";
+            this.StatusBar.Location = new System.Drawing.Point(0, 64);
+            this.StatusBar.Name = "StatusBar";
+            this.StatusBar.Size = new System.Drawing.Size(473, 22);
+            this.StatusBar.TabIndex = 1;
+            this.StatusBar.Text = "statusStrip1";
+            this.StatusBar.DoubleClick += new System.EventHandler(this.StatusBar_DoubleClick);
+            // 
+            // ConnectionString
+            // 
+            this.ConnectionString.Name = "ConnectionString";
+            this.ConnectionString.Size = new System.Drawing.Size(111, 17);
+            this.ConnectionString.Text = "Connection String";
             // 
             // ConsoleText
             // 
@@ -108,25 +119,19 @@
             this.ConsoleText.Size = new System.Drawing.Size(473, 39);
             this.ConsoleText.TabIndex = 2;
             // 
-            // ConnectionString
-            // 
-            this.ConnectionString.Name = "ConnectionString";
-            this.ConnectionString.Size = new System.Drawing.Size(111, 17);
-            this.ConnectionString.Text = "Connection String";
-            // 
             // CommunicationIndicator
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.ConsoleText);
-            this.Controls.Add(this.statusStrip1);
+            this.Controls.Add(this.StatusBar);
             this.Controls.Add(this.toolStrip1);
             this.Name = "CommunicationIndicator";
             this.Size = new System.Drawing.Size(473, 86);
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
-            this.statusStrip1.ResumeLayout(false);
-            this.statusStrip1.PerformLayout();
+            this.StatusBar.ResumeLayout(false);
+            this.StatusBar.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -135,11 +140,11 @@
         #endregion
 
         private System.Windows.Forms.ToolStrip toolStrip1;
-        private System.Windows.Forms.StatusStrip statusStrip1;
+        private System.Windows.Forms.StatusStrip StatusBar;
         private System.Windows.Forms.TextBox ConsoleText;
         private System.Windows.Forms.ToolStripButton toolStripCopySelect;
-        private System.Windows.Forms.ToolStripButton toolStripButton2;
-        private System.Windows.Forms.ToolStripButton toolStripButton3;
+        private System.Windows.Forms.ToolStripButton toolStripSave;
+        private System.Windows.Forms.ToolStripButton toolStripInteractiveCtrl;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripStatusLabel ConnectionString;
     }

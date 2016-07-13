@@ -99,11 +99,11 @@ namespace Communication.Interface.UI
                         Win32Interop.GetWindowRect(mainWindowHandle, out currentPosition);
                         if (!currentPosition.IsSame(lastPosition))
                         {
-                            RunOnUIThread(delegate()
+                            this.SafeInvoke(() =>
                             {
                                 ViewerPosUpdate(currentPosition);
-                                return null;
                             });
+
                             lastPosition = currentPosition;
                         }
                     }
@@ -152,7 +152,7 @@ namespace Communication.Interface.UI
 
         public void ShowViewer()
         {
-            RunOnUIThread(delegate()
+            this.SafeInvoke(() =>
             {
                 if (!this.Visible)
                 {
@@ -160,6 +160,11 @@ namespace Communication.Interface.UI
                     {
                         ShowDialog();
                     }));
+
+                    if (Thread.CurrentThread.GetApartmentState() != ApartmentState.STA)
+                    {
+                        viewerThread.SetApartmentState(ApartmentState.STA);
+                    }
                     viewerThread.Start();
                     Thread.Sleep(1000);
                 }
@@ -171,16 +176,14 @@ namespace Communication.Interface.UI
                         BringToFront();
                     }
                 }
-                return null;
             });
         }
 
         public void HideViewer()
         {
-            RunOnUIThread(delegate()
+            this.SafeInvoke(() =>
             {
                 Hide();
-                return null;
             });
         }
 
@@ -195,7 +198,7 @@ namespace Communication.Interface.UI
 
             if (this.Visible)
             {
-                RunOnUIThread(delegate()
+                this.SafeInvoke(() =>
                 {
                     Close();
                     Dispose();
@@ -203,7 +206,6 @@ namespace Communication.Interface.UI
                     {
                         viewerThread.Join();
                     }
-                    return null;
                 });
             }
         }
@@ -213,24 +215,21 @@ namespace Communication.Interface.UI
             string ChannelName = CommunicationInterface.FriendlyName;
             if (!channels.ContainsKey(ChannelName))
             {
-                RunOnUIThread(delegate()
+                this.SafeInvoke(() =>
                 {
                     CommunicationChannel channel = new CommunicationChannel(ChannelName, displayFilters);
                     channel.AttachInterface(CommunicationInterface, ClearPrevious);
                     channels.Add(ChannelName, channel);
                     ChannelHost.TabPages.Add(channel);
                     SortChannelDisplay();
-                    return null;
                 });
-
             }
             else
             {
-                RunOnUIThread(delegate()
+                this.SafeInvoke(() =>
                 {
                     CommunicationChannel channel = channels[ChannelName];
                     channel.AttachInterface(CommunicationInterface, ClearPrevious);
-                    return null;
                 });
             }
         }
@@ -355,6 +354,14 @@ namespace Communication.Interface.UI
             }
         }
 
+        private void Viewer_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            foreach (CommunicationChannel channel in channels.Values)
+            {
+                channel.Release();
+            }
+        }
+
         private void toolStripDockNone_Click(object sender, EventArgs e)
         {
             if (!toolStripDockNone.Checked)
@@ -424,35 +431,5 @@ namespace Communication.Interface.UI
             }
         }
 
-        delegate object RunOnUIThreadDelegate(Func<object> Function);
-        public object RunOnUIThread(Func<object> Function)
-        {
-            if (this.InvokeRequired)
-            {
-                RunOnUIThreadDelegate UIThreadDelegate = new RunOnUIThreadDelegate(RunOnUIThread);
-                try
-                {
-                    return Invoke(UIThreadDelegate, Function);
-                }
-                catch (Exception e)
-                {
-                    MessageBox.Show(e.Message);
-                    return null;
-                }
-            }
-            else
-            {
-                try
-                {
-                    return Function();
-                }
-                catch (Exception e)
-                {
-                    MessageBox.Show(e.Message);
-                    return null;
-                }
-            }
-
-        }
     }
 }

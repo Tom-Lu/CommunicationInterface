@@ -9,12 +9,12 @@ namespace Communication.Interface.UI
     public class CommunicationChannel : TabPage
     {
         private CommunicationIndicator indicator = null;
-        private string ChannelName = string.Empty;
+        private string _channelName = string.Empty;
 
-        private string Name 
+        private string ChannelName 
         {
-            get { return ChannelName; }
-            set { ChannelName = value; Text = ChannelName; }      
+            get { return _channelName; }
+            set { _channelName = value; Text = _channelName; }      
         }
 
         public CommunicationChannel() : this("", null)
@@ -24,7 +24,7 @@ namespace Communication.Interface.UI
 
         public CommunicationChannel(string Name, Dictionary<string, string> Filters)
         {
-            this.Name = Name;
+            this.ChannelName = Name;
             indicator = new CommunicationIndicator(Filters);
             indicator.Dock = DockStyle.Fill;
             this.Controls.Add(indicator);
@@ -38,6 +38,14 @@ namespace Communication.Interface.UI
         public void DeattachInterface(ICommunicationInterface CommunicationInterface)
         {
             indicator.DeattachInterface(CommunicationInterface);
+        }
+
+        public void Release()
+        {
+            if (indicator != null)
+            {
+                indicator.Release();
+            }
         }
     }
 }

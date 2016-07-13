@@ -298,7 +298,7 @@ namespace Communication.Interface.Implementation
         {
             if (BufferUpdatedHandler != null)
             {
-                BufferUpdatedHandler(ReadBuffer.ToString());
+                BufferUpdatedHandler(this, ReadBuffer.ToString());
             }
         }
 
@@ -306,7 +306,7 @@ namespace Communication.Interface.Implementation
         {
             if (WriteEventHandler != null)
             {
-                WriteEventHandler(WriteBuffer);
+                WriteEventHandler(this, WriteBuffer);
             }
         }
     }
