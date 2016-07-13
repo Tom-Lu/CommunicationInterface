@@ -40,6 +40,14 @@ namespace Communication.Interface.UI
             indicator.DeattachInterface(CommunicationInterface);
         }
 
+        public void Save(string FileName, bool Overwrite)
+        {
+            if (indicator != null)
+            {
+                indicator.Save(FileName, Overwrite);
+            }
+        }
+
         public void Release()
         {
             if (indicator != null)

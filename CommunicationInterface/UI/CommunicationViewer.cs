@@ -244,6 +244,16 @@ namespace Communication.Interface.UI
             }
         }
 
+        public void Save(string FriendlyName, string FileName, bool Overwrite)
+        {
+            string ChannelName = FriendlyName;
+            if (channels.ContainsKey(ChannelName))
+            {
+                CommunicationChannel channel = channels[ChannelName];
+                channel.Save(FileName, Overwrite);
+            }
+        }
+
         public void SortChannelDisplay()
         {
             channels = channels.OrderBy(x => x.Value).ToDictionary(x => x.Key, x => x.Value);

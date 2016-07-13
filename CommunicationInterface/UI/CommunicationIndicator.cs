@@ -78,6 +78,19 @@ namespace Communication.Interface.UI
             });
         }
 
+        public void Save(string FileName, bool Overwrite)
+        {
+            if (File.Exists(FileName) && Overwrite)
+            {
+                File.Delete(FileName);
+            }
+
+            this.SafeInvoke(() =>
+            {
+                File.AppendAllText(FileName, ConsoleText.Text);
+            });
+        }
+
         public void Release()
         {
             if (backgroundReadTimer != null)
@@ -139,7 +152,8 @@ namespace Communication.Interface.UI
                         displayBuffer.Seek(0, SeekOrigin.Begin);
                         this.SafeInvoke(() =>
                         {
-                            ConsoleText.AppendText(displayBufferReader.ReadToEnd());
+                            ConsoleText.AppendText(FilterText(displayBufferReader.ReadToEnd()));
+                            ConsoleText.ScrollToCaret();
                         });
                         displayBuffer.SetLength(0);
                         UpdateConnString(this.latestActiveInterface);
@@ -147,6 +161,23 @@ namespace Communication.Interface.UI
                 }
 
                 Thread.Sleep(100);
+            }
+        }
+
+        private string FilterText(string text)
+        {
+            if (displayFilters == null)
+            {
+                return text;
+            }
+            else
+            {
+                string filtered_text = text;
+                foreach (KeyValuePair<string, string> filterItem in displayFilters)
+                {
+                    filtered_text = filtered_text.Replace(filterItem.Key, filterItem.Value);
+                }
+                return filtered_text;
             }
         }
 
