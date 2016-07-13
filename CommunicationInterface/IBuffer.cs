@@ -147,6 +147,16 @@ namespace Communication.Interface
         bool ReadHexRegExp(string Regex, string GroupName, out long value);
 
         /// <summary>
+        /// Extract buffer content based begin text and end text
+        /// </summary>
+        /// <param name="BeginText">Begin string to search for</param>
+        /// <param name="EndText">End string to search for</param>
+        /// <param name="Index">Specify number of begin string match for extract content, if no enough begin text found, then return false</param>
+        /// <param name="OutputString">The extracted content per input</param>
+        /// <returns>true if output string validate, false if unable extract any content per input</returns>
+        bool Extract(string BeginText, string EndText, int Index, out string OutputString);
+
+        /// <summary>
         /// Save buffer content to file
         /// </summary>
         /// <param name="FileName">file name</param>

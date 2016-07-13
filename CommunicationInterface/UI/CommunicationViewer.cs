@@ -15,7 +15,7 @@ namespace Communication.Interface.UI
 {
     public enum DockType { None, Left, Top, Right, Bottom }
 
-    public partial class CommunicationViewer : Form
+    public partial class CommunicationViewer : Form, ICommunicationViewer
     {
         private enum TransparenceLevel { Low, Mid, High };
         private DockType dock = DockType.Right;
@@ -63,7 +63,7 @@ namespace Communication.Interface.UI
             Release();
         }
 
-        public CommunicationViewer AddDisplayFilter(string Source, string Target)
+        public ICommunicationViewer AddDisplayFilter(string Source, string Target)
         {
             if (displayFilters != null)
             {
@@ -111,7 +111,7 @@ namespace Communication.Interface.UI
             }
         }
 
-        public void ViewerPosUpdate(Win32Interop.Rect WindowPosition)
+        private void ViewerPosUpdate(Win32Interop.Rect WindowPosition)
         {
             switch (dock)
             {
@@ -254,7 +254,7 @@ namespace Communication.Interface.UI
             }
         }
 
-        public void SortChannelDisplay()
+        private void SortChannelDisplay()
         {
             channels = channels.OrderBy(x => x.Value).ToDictionary(x => x.Key, x => x.Value);
 

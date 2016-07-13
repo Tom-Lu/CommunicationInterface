@@ -29,7 +29,7 @@ namespace CommLauncher
                     CommInterface.Open();
                     if (CommInterface.IsOpened)
                     {
-                        Application.Run(CommunicationManager.GetViewer());
+                        Application.Run((Form)CommunicationManager.GetViewer());
                     }
                 }
                 catch (Exception e)

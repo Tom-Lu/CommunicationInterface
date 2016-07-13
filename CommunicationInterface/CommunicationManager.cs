@@ -160,12 +160,12 @@ namespace Communication.Interface
         /// Get communiction viewer instance
         /// </summary>
         /// <returns>communiction viewer instance</returns>
-        public static CommunicationViewer GetCommunicationViewer()
+        public static ICommunicationViewer GetCommunicationViewer()
         {
             return GetViewer();
         }
 
-        public static CommunicationViewer GetViewer()
+        public static ICommunicationViewer GetViewer()
         {
             if (viewer == null)
             {
@@ -179,12 +179,12 @@ namespace Communication.Interface
         /// Initial communiction viewer
         /// </summary>
         /// <returns>communiction viewer instance</returns>
-        public static CommunicationViewer InitCommunicationViewer()
+        public static ICommunicationViewer InitCommunicationViewer()
         {
             return InitViewer();
         }
 
-        public static CommunicationViewer InitViewer()
+        public static ICommunicationViewer InitViewer()
         {
             return InitViewer(DockType.None);
         }
@@ -194,12 +194,12 @@ namespace Communication.Interface
         /// </summary>
         /// <param name="Dock">Specifies the position which communication viewer will dock to.</param>
         /// <returns>communiction viewer instance</returns>
-        public static CommunicationViewer InitCommunicationViewer(DockType Dock)
+        public static ICommunicationViewer InitCommunicationViewer(DockType Dock)
         {
             return InitViewer(Dock);
         }
 
-        public static CommunicationViewer InitViewer(UI.DockType DockType)
+        public static ICommunicationViewer InitViewer(UI.DockType DockType)
         {
             if (viewer == null)
             {

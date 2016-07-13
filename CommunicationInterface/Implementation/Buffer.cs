@@ -244,6 +244,49 @@ namespace Communication.Interface.Implementation
             return status;
         }
 
+        public bool Extract(string BeginText, string EndText, int Index, out string OutputString)
+        {
+            OutputString = string.Empty;
+            string buffer_content = ToString();
+            if (string.IsNullOrEmpty(buffer_content) == false)
+            {
+                // Search Begin
+                int start = -1;
+                // search with number of occurs
+                for (int i = 1; i <= Index; i++)
+                    start = buffer_content.IndexOf(BeginText, start + 1);
+
+                if (start < 0)
+                    return false;
+                start += BeginText.Length;
+
+
+                // Search End
+                if (string.IsNullOrEmpty(EndText))
+                {
+                    OutputString = buffer_content.Substring(start);
+                    return true;
+                }
+
+                int end = buffer_content.IndexOf(EndText, start);
+                if (end < 0)
+                {
+                    return false;
+                }
+
+                end -= start;
+
+                OutputString = buffer_content.Substring(start, end);
+                // End Final
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+
+        }
+
         public void Save(string FileName, bool Overwrite)
         {
             if (File.Exists(FileName) && Overwrite)
