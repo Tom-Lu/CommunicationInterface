@@ -150,25 +150,32 @@ namespace Layer2Net
             _arp_service.SendGratuitus();
         }
 
-        public bool Ping(string RemoteIP, string RemoteMac, ushort Count = 10)
-        {
-            return _icmp_service.Ping(new IpV4Address(RemoteIP), new MacAddress(RemoteMac), Count);
-        }
-
         public bool Ping(string RemoteIP, ushort Count = 10)
         {
-            string RemoteMac = string.Empty;
-            if (_arp_service.Resolve(RemoteIP, out RemoteMac))
+            return Ping(RemoteIP, null, Count);
+        }
+
+        public bool Ping(string RemoteIP, string RemoteMac, ushort Count = 10)
+        {
+            if (RemoteMac != null && !string.IsNullOrEmpty(RemoteMac))
             {
                 return _icmp_service.Ping(new IpV4Address(RemoteIP), new MacAddress(RemoteMac), Count);
             }
             else
             {
-                return false;
+                string ResolveMac = string.Empty;
+                if (_arp_service.Resolve(RemoteIP, out ResolveMac))
+                {
+                    return _icmp_service.Ping(new IpV4Address(RemoteIP), new MacAddress(ResolveMac), Count);
+                }
+                else
+                {
+                    return false;
+                }
             }
         }
 
-        public bool PingUntilState(string Target, bool TargetState, double TargetStateTime, double Timeout, bool ClearArp = true)
+        public bool PingUntilState(string TargetIP, bool TargetState, double TargetStateTime, double Timeout, bool ClearArp)
         {
             DateTime Start = DateTime.Now;
             DateTime TargetStateStart = DateTime.Now;
@@ -178,7 +185,12 @@ namespace Layer2Net
             do
             {
                 System.Threading.Thread.Sleep((int)(TargetStateTime * 100));
-                CurrentState = Ping(Target, 3);
+                if (ClearArp)
+                {
+                    RemoveArp(null); // Clear arp table
+                }
+
+                CurrentState = Ping(TargetIP, 3);
                 if (CurrentState != TargetState)
                 {
                     TargetStateStart = DateTime.Now;
@@ -191,6 +203,22 @@ namespace Layer2Net
             } while (!Successful && (DateTime.Now - Start).TotalSeconds < Timeout);
 
             return Successful;
+        }
+
+        public void AddArp(string IP, string MAC)
+        {
+            if (_arp_service != null)
+            {
+                _arp_service.Add(IP, MAC);
+            }
+        }
+
+        public void RemoveArp(string IP)
+        {
+            if (_arp_service != null)
+            {
+                _arp_service.Remove(IP);
+            }
         }
 
         public void PacketProcess(Packet packet)

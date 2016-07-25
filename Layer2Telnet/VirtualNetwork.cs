@@ -225,17 +225,24 @@ namespace Layer2Net
 
         public void SendPacket(Packet packet)
         {
-            new Thread(new System.Threading.ParameterizedThreadStart(delegate(object obj)
+            if (IsRunning)
             {
-                if (_packet_communicator !=null && packet != null)
+                new Thread(new System.Threading.ParameterizedThreadStart(delegate(object obj)
                 {
-                    try
+                    if (_packet_communicator != null && packet != null)
                     {
-                        _packet_communicator.SendPacket(packet);
+                        try
+                        {
+                            _packet_communicator.SendPacket(packet);
+                        }
+                        catch { }
                     }
-                    catch {}
-                }
-            })).Start();
+                })).Start();
+            }
+            else
+            {
+                throw new Exception("Virtual Network is not start yet!!!");
+            }
         }
 
         public void PostTraceMessage(string Message, bool AppendLineFeed = true)

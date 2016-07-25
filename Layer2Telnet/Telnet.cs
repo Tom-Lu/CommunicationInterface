@@ -34,7 +34,6 @@ namespace Layer2Telnet
             CLOSING,
             TIME_WAIT
         }
-        private static VirtualNetwork Network = null;
 
         private const ushort CONNECTION_TIMEOUT = 20000;
         private const ushort DISCONNECT_TIMEOUT = 2000;
@@ -63,21 +62,21 @@ namespace Layer2Telnet
         public Telnet(string ConfigString, string FriendlyName) : base(ConfigString, FriendlyName)
         {
             // L2Telnet:IP=192.168.1.1, Port=23, Adapter=SOCKET_1, ConfigFile=Config\\TEST_NET.network
-            if (Network == null)
+            if (VirtualNetwork.Instance == null)
             {
                 string NetworkConfigFile = Config["ConfigFile"];
-                Network = VirtualNetwork.Load(NetworkConfigFile);
-                Network.Start();
+                VirtualNetwork.Load(NetworkConfigFile);
+                VirtualNetwork.Instance.Start();
             }
             else
             {
-                if (!Network.IsRunning)
+                if (!VirtualNetwork.Instance.IsRunning)
                 {
-                    Network.Start();
+                    VirtualNetwork.Instance.Start();
                 }
             }
 
-            Adapter = Network.GetAdapterByName(Config["Adapter"]);
+            Adapter = VirtualNetwork.Instance.GetAdapterByName(Config["Adapter"]);
             Adapter.BoardcastLocalAddress();
             this._service = Adapter.TcpService;
             this._adapter = Adapter;
@@ -315,9 +314,13 @@ namespace Layer2Telnet
                 {
                     _current_state = TCP_STATE.CLOSED;
                 }
-                else if (PSH)   // 需处理传输数据
+                else if (PSH || ((ACK) && tcp.PayloadLength > 0))   // 需处理传输数据
                 {
-                    if (tcp.SequenceNumber == _last_acknowledgment_number)
+                    if (ACK && tcp.SequenceNumber == _last_acknowledgment_number - 1)  // Keep Alive
+                    {
+                        SendTcpCtrlPacket(_last_acknowledgment_number, TcpControlBits.Acknowledgment);
+                    }
+                    else // if (tcp.SequenceNumber == _last_acknowledgment_number)
                     {
                         try
                         {
@@ -333,10 +336,7 @@ namespace Layer2Telnet
                             SendTcpCtrlPacket(tcp.SequenceNumber + (uint)tcp.PayloadLength, TcpControlBits.Acknowledgment);
                         } catch {}
                     }
-                    else if (ACK && tcp.SequenceNumber == _last_acknowledgment_number - 1)  // Keep Alive
-                    {
-                        SendTcpCtrlPacket(_last_acknowledgment_number, TcpControlBits.Acknowledgment);
-                    }
+
                 }
                 else if (ACK && _current_state == TCP_STATE.ESTABLISHED)
                 {

@@ -14,7 +14,7 @@ namespace Layer2Net
 {
     public class ArpService
     {
-        private const int ARP_RESOLVE_TIMEOUT = 3000;
+        private const int ARP_RESOLVE_TIMEOUT = 1000;
         private VirtualAdapter _adapter;
         private Dictionary<IpV4Address, MacAddress> _arp_table;
         private IpV4Address _current_arp_probe_target_ip;
@@ -29,12 +29,50 @@ namespace Layer2Net
 
         public void Add(string IP, string Mac)
         {
-            _arp_table.Add(new IpV4Address(IP), new MacAddress(Mac));
+            Add(new IpV4Address(IP), new MacAddress(Mac));
         }
 
         public void Add(IpV4Address IP, MacAddress Mac)
         {
-            _arp_table.Add(IP, Mac);
+            if (_arp_table.ContainsKey(IP))
+            {
+                _arp_table[IP] = Mac;
+                VirtualNetwork.Instance.PostTraceMessage("ARP table item update: " + IP.ToString() + " = " + Mac.ToString());
+            }
+            else
+            {
+                _arp_table.Add(IP, Mac);
+                VirtualNetwork.Instance.PostTraceMessage("ARP table item add: " + IP.ToString() + " = " + Mac.ToString());
+            }
+        }
+
+        public void Remove(string IP)
+        {
+            if (IP != null && !string.IsNullOrEmpty(IP))
+            {
+                Remove(new IpV4Address(IP));
+            }
+            else
+            {
+                Remove(IpV4Address.Zero);
+            }
+        }
+
+        public void Remove(IpV4Address IP)
+        {
+            if (IP != null && !IP.Equals(IpV4Address.Zero))
+            {
+                if (_arp_table.ContainsKey(IP))
+                {
+                    _arp_table.Remove(IP);
+                    VirtualNetwork.Instance.PostTraceMessage("ARP table item remove: " + IP.ToString());
+                }
+            }
+            else
+            {
+                _arp_table.Clear();
+                VirtualNetwork.Instance.PostTraceMessage("ARP table clear");
+            }
         }
 
         public void SendGratuitus()
@@ -166,17 +204,17 @@ namespace Layer2Net
             IpV4Address TargetIpAddress = new IpV4Address(TargetIP);
             MacAddress ResolvedMacAddress = MacAddress.Zero;
 
-            ResolveResult = Resolve(TargetIpAddress, out ResolvedMacAddress);
-            if (ResolveResult)
+            if (_arp_table.ContainsKey(TargetIpAddress))
             {
-                ResolvedMac = ResolvedMacAddress.ToString();
+                ResolvedMac = _arp_table[TargetIpAddress].ToString();
+                ResolveResult = true;
             }
             else
             {
-                if (_arp_table.ContainsKey(TargetIpAddress))
+                ResolveResult = Resolve(TargetIpAddress, out ResolvedMacAddress);
+                if (ResolveResult)
                 {
-                    ResolvedMac = _arp_table[TargetIpAddress].ToString();
-                    ResolveResult = true;
+                    ResolvedMac = ResolvedMacAddress.ToString();
                 }
                 else
                 {
