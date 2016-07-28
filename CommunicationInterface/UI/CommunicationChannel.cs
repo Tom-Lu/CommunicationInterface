@@ -6,7 +6,7 @@ using System.Windows.Forms;
 
 namespace Communication.Interface.UI
 {
-    public class CommunicationChannel : TabPage
+    public class CommunicationChannel : TabPage, IComparable
     {
         private CommunicationIndicator indicator = null;
         private string _channelName = string.Empty;
@@ -53,6 +53,18 @@ namespace Communication.Interface.UI
             if (indicator != null)
             {
                 indicator.Release();
+            }
+        }
+
+        public int CompareTo(object obj)
+        {
+            if (obj != null && obj is CommunicationChannel)
+            {
+                return string.Compare(ChannelName, (obj as CommunicationChannel).ChannelName);
+            }
+            else
+            {
+                return 1;
             }
         }
     }

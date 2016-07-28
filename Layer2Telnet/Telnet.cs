@@ -148,6 +148,7 @@ namespace Layer2Telnet
         override public void Open()
         {
             string MACString = string.Empty;
+            _adapter.BoardcastLocalAddress();
             if (_adapter.ArpService.Resolve(_remote_ip.ToString(), out MACString))
             {
                 this._remote_mac = new MacAddress(MACString);

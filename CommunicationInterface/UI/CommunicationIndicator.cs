@@ -66,7 +66,14 @@ namespace Communication.Interface.UI
         {
             this.SafeInvoke(() =>
             {
-                this.ConnectionString.Text = CommunicationInterface.ConfigString;
+                if (CommunicationInterface != null)
+                {
+                    this.ConnectionString.Text = CommunicationInterface.ConfigString;
+                }
+                else
+                {
+                    this.ConnectionString.Text = "";
+                }
             });
         }
 

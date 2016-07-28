@@ -28,9 +28,10 @@ namespace Communication.Interface.Test
             var Va = Vn.GetAdapterByName("SOCKET_1");
 
             Va.AddArp("192.168.1.1", "00:11:22:33:44:66");
-            bool ping = Va.PingUntilState("192.168.1.1", true, 5, 30, false);
+            //bool ping = Va.PingUntilState("192.168.1.1", true, 5, 30, false);
 
             ICommunicationInterface CommInterface = CommunicationManager.InstanceInterface("L2Telnet:IP=192.168.1.1, Port=23, Adapter=SOCKET_1, ConfigFile=WAW-1P.network", "Zhone OLT");
+            ICommunicationInterface CommInterface2 = CommunicationManager.InstanceInterface("L2Telnet:IP=192.168.1.1, Port=23, Adapter=SOCKET_2, ConfigFile=WAW-1P.network", "Zhone OLT22");
             //ICommunicationInterface CommInterface = CommunicationManager.InstanceInterface("Telnet:IP=192.168.1.1,Port=23", "HGU");
 
             // Buffer update event handler for console applicaiton, for WinForm applicaiton you should use ShowCommunicationViewer to display the trace window
