@@ -110,7 +110,11 @@ namespace Layer2Net
 
                             _instance._packet_process_thread = new Thread(new System.Threading.ParameterizedThreadStart(delegate(object obj)
                             {
-                                _instance._packet_communicator.ReceivePackets(-1, _instance.PacketProcess);
+                                PacketCommunicatorReceiveResult result = _instance._packet_communicator.ReceivePackets(-1, _instance.PacketProcess);
+                                if (result != PacketCommunicatorReceiveResult.BreakLoop)
+                                {
+                                    throw new Exception(string.Format("Unexpected virutal network down: {0}", result.ToString()));
+                                }
                             }));
 
                             _instance._packet_process_thread.Name = "PacketProcessThread";

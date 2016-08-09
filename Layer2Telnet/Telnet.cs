@@ -46,6 +46,7 @@ namespace Layer2Telnet
         private MacAddress _remote_mac;
         private ushort _remote_port;
         private bool _response_telnet_ctrl = true;
+        private bool _send_gratuitus_when_no_response = true;
         private bool GoAhead = false;
 
         private TCP_STATE _current_state = TCP_STATE.CLOSED;
@@ -92,6 +93,11 @@ namespace Layer2Telnet
             if (Config.ContainsKey("RESPONSE_TELNET_CTRL") && !string.IsNullOrEmpty(Config["RESPONSE_TELNET_CTRL"]))
             {
                 this._response_telnet_ctrl = bool.Parse(Config["RESPONSE_TELNET_CTRL"]);
+            }
+
+            if (Config.ContainsKey("SEND_GRATUITUS") && !string.IsNullOrEmpty(Config["SEND_GRATUITUS"]))
+            {
+                this._send_gratuitus_when_no_response = bool.Parse(Config["SEND_GRATUITUS"]);
             }
 
             _current_state = TCP_STATE.CLOSED;
@@ -227,7 +233,7 @@ namespace Layer2Telnet
             }
             else
             {
-                if (IsOpen)
+                if (_send_gratuitus_when_no_response && IsOpen)
                 {
                     if ((DateTime.Now - _last_read_available_time).TotalMilliseconds >= KEEP_ALIVE_PERIOD)
                     {
