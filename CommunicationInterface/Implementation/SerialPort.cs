@@ -77,6 +77,8 @@ namespace Communication.Interface.Implementation
 
         override public void Flush()
         {
+            base.GlobalBuffer.Clear();
+            base.ReadBuffer.Clear();
             stream.Flush();
         }
 

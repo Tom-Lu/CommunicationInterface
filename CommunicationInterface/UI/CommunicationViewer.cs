@@ -196,18 +196,10 @@ namespace Communication.Interface.UI
                 windowUpdateTimer = null;
             }
 
-            if (this.Visible)
+            this.SafeInvoke(() =>
             {
-                this.SafeInvoke(() =>
-                {
-                    Close();
-                    Dispose();
-                    if (viewerThread.IsAlive)
-                    {
-                        viewerThread.Join();
-                    }
-                });
-            }
+                Close();
+            });
         }
 
         public void AttachInterface(ICommunicationInterface CommunicationInterface, bool ClearPrevious = true)
@@ -232,6 +224,11 @@ namespace Communication.Interface.UI
                     channel.AttachInterface(CommunicationInterface, ClearPrevious);
                 });
             }
+        }
+
+        public CommunicationChannel GetCommunicationChannel(ICommunicationInterface CommunicationInterface)
+        {
+            return channels[CommunicationInterface.FriendlyName];
         }
 
         public void DeattachInterface(ICommunicationInterface CommunicationInterface)

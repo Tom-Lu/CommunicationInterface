@@ -1,4 +1,6 @@
 ﻿using System;
+using Communication.Interface.UI;
+
 namespace Communication.Interface
 {
     public interface ICommunicationViewer
@@ -7,6 +9,7 @@ namespace Communication.Interface
         void AttachInterface(Communication.Interface.ICommunicationInterface CommunicationInterface, bool ClearPrevious = true);
         void ClearDisplayFilter();
         void DeattachInterface(Communication.Interface.ICommunicationInterface CommunicationInterface);
+        CommunicationChannel GetCommunicationChannel(Communication.Interface.ICommunicationInterface CommunicationInterface);
         void HideViewer();
         void Release();
         void Save(string FriendlyName, string FileName, bool Overwrite);

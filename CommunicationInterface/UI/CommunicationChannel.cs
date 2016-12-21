@@ -56,6 +56,14 @@ namespace Communication.Interface.UI
             }
         }
 
+        public void Clear()
+        {
+            if (indicator != null)
+            {
+                indicator.Clear();
+            }
+        }
+
         public int CompareTo(object obj)
         {
             if (obj != null && obj is CommunicationChannel)
