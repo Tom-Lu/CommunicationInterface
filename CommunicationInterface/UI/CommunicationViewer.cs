@@ -119,10 +119,11 @@ namespace Communication.Interface.UI
                     break;
                 case DockType.Left:
                     {
-                        this.Left = 0;
+                        Screen screen = Screen.FromPoint(new Point(WindowPosition.Left, WindowPosition.Top));
+                        this.Left = screen.WorkingArea.Left;
                         this.Top = WindowPosition.Top;
                         this.Height = WindowPosition.Bottom - WindowPosition.Top;
-                        this.Width = WindowPosition.Left;
+                        this.Width = (WindowPosition.Left - screen.WorkingArea.Left);
                     }
                     break;
                 case DockType.Top:
@@ -137,7 +138,8 @@ namespace Communication.Interface.UI
                         this.Left = WindowPosition.Right;
                         this.Top = WindowPosition.Top;
                         this.Height = WindowPosition.Bottom - WindowPosition.Top;
-                        this.Width = Screen.FromPoint(new Point(WindowPosition.Left, WindowPosition.Top)).WorkingArea.Width - WindowPosition.Right;
+                        Screen screen = Screen.FromPoint(new Point(WindowPosition.Left, WindowPosition.Top));
+                        this.Width = screen.WorkingArea.Width - (WindowPosition.Right - screen.WorkingArea.Left);
                     }
                     break;
                 case DockType.Bottom:

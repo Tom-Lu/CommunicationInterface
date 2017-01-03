@@ -126,6 +126,7 @@
             this.Controls.Add(this.ConsoleText);
             this.Controls.Add(this.StatusBar);
             this.Controls.Add(this.toolStrip1);
+            this.ImeMode = System.Windows.Forms.ImeMode.Off;
             this.Name = "CommunicationIndicator";
             this.Size = new System.Drawing.Size(473, 86);
             this.toolStrip1.ResumeLayout(false);
