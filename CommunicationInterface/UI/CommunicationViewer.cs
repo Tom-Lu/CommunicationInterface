@@ -40,16 +40,6 @@ namespace Communication.Interface.UI
             this.Text = string.Format("CommViewer V{0}.{1}.{2} {3}", LibraryVersion.Major, LibraryVersion.Minor, LibraryVersion.Revision, BuildDate.ToString("yyyyMMddHHmmss"));
             this.dock = dock;
 
-            mainWindowHandle = Win32Window.GetCurrentProcessMainWindowHandle();
-            if (mainWindowHandle != IntPtr.Zero)
-            {
-                windowUpdateTimer = new System.Threading.Timer(new TimerCallback(ViewerPosUpdateHandler), null, Timeout.Infinite, 300);
-            }
-            else
-            {
-                toolStripDock.Enabled = false;
-            }
-
             SetDockType(dock);
             SetTransparenceLevel(TransparenceLevel.Low);
             this.VisibleChanged += new EventHandler(Viewer_VisibleChanged);
@@ -191,17 +181,34 @@ namespace Communication.Interface.UI
 
         public void Release()
         {
+            this.SafeInvoke(() =>
+            {
+                Close();
+            });
+        }
+
+        private void StartUpdateTimer()
+        {
+            lastPosition = Win32Interop.Rect.Zero();
+            mainWindowHandle = Win32Window.GetCurrentProcessMainWindowHandle();
+            if (mainWindowHandle != IntPtr.Zero)
+            {
+                windowUpdateTimer = new System.Threading.Timer(new TimerCallback(ViewerPosUpdateHandler), null, Timeout.Infinite, 300);
+            }
+            else
+            {
+                toolStripDock.Enabled = false;
+            }
+        }
+
+        private void StopUpdateTimer()
+        {
             if (windowUpdateTimer != null)
             {
                 windowUpdateTimer.Change(Timeout.Infinite, 0); // Stop timer
                 windowUpdateTimer.Dispose();
                 windowUpdateTimer = null;
             }
-
-            this.SafeInvoke(() =>
-            {
-                Close();
-            });
         }
 
         public void AttachInterface(ICommunicationInterface CommunicationInterface, bool ClearPrevious = true)
@@ -437,6 +444,18 @@ namespace Communication.Interface.UI
             if (!toolStripTransparenceHigh.Checked)
             {
                 SetTransparenceLevel(TransparenceLevel.High);
+            }
+        }
+
+        private void CommunicationViewer_VisibleChanged(object sender, EventArgs e)
+        {
+            if (this.Visible)
+            {
+                StartUpdateTimer();
+            }
+            else
+            {
+                StopUpdateTimer();
             }
         }
 

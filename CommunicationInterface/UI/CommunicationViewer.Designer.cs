@@ -178,6 +178,7 @@
             this.Name = "CommunicationViewer";
             this.Text = "CommunicationViewer";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Viewer_FormClosing);
+            this.VisibleChanged += new System.EventHandler(this.CommunicationViewer_VisibleChanged);
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
             this.ResumeLayout(false);
