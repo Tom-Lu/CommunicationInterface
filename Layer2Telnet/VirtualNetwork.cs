@@ -99,7 +99,7 @@ namespace Layer2Net
                         if (_instance._packet_communicator != null)
                         {
                             StringBuilder filter = new StringBuilder();
-                            filter.Append(@"arp");
+                            filter.Append(@"arp or ether dst FF:FF:FF:FF:FF:FF");
                             _adapter_hashtable = new Hashtable();
                             foreach (VirtualAdapter Adapter in _adapters)
                             {
