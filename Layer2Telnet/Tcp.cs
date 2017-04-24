@@ -39,14 +39,20 @@ namespace Layer2Telnet
         private const ushort DISCONNECT_TIMEOUT = 2000;
         private const ushort TCP_OPEN_TIMEOUT = 1000;
         private const ushort KEEP_ALIVE_PERIOD = 500;
+        private const byte TTL = 128;
+        private const ushort MAX_SEGMENT_SIZE = 1460;
+        private const byte WINDOW_SCALE = 8;
+
         private TcpService _service = null;
         private VirtualAdapter _adapter = null;
         private ushort _local_port;
         private IpV4Address _remote_ip;
         private MacAddress _remote_mac;
         private ushort _remote_port;
+        private bool _send_gratuitus_when_no_response = true;
 
         private TCP_STATE _current_state = TCP_STATE.CLOSED;
+        private ushort _current_ip_id = 30000;
         private uint _current_sequence_number = 0;
         private uint _last_acknowledgment_number = 0;
         private ushort _local_tcp_window_size = 65535;
@@ -85,6 +91,11 @@ namespace Layer2Telnet
             if (Config.ContainsKey("MAC") && !string.IsNullOrEmpty(Config["MAC"]))
             {
                 this._remote_mac = new MacAddress(Config["MAC"]);
+            }
+
+            if (Config.ContainsKey("SEND_GRATUITUS") && !string.IsNullOrEmpty(Config["SEND_GRATUITUS"]))
+            {
+                this._send_gratuitus_when_no_response = bool.Parse(Config["SEND_GRATUITUS"]);
             }
 
             _current_state = TCP_STATE.CLOSED;
@@ -163,8 +174,14 @@ namespace Layer2Telnet
             VirtualNetwork.Instance.PostTraceMessage("TCP OPEN: " + _remote_ip.ToString() + " " + _remote_port.ToString());
             InputBuffer = new Queue<byte>();
             _connection_wait_handle.Reset();
-            SendTcpCtrlPacket(0, TcpControlBits.Synchronize);    // ACK = false, SYNC = true, FIN = false
             _current_state = TCP_STATE.SYN_SENT;
+
+            TcpOptions tcpOptions = new TcpOptions(
+            new TcpOptionMaximumSegmentSize(MAX_SEGMENT_SIZE),
+            new TcpOptionWindowScale(WINDOW_SCALE)
+            );
+
+            SendTcpCtrlPacket(0, TcpControlBits.Synchronize, tcpOptions);    // ACK = false, SYNC = true, FIN = false
             _connection_wait_handle.WaitOne(TCP_OPEN_TIMEOUT, true); // wait for connection process finish
             if (_current_state == TCP_STATE.ESTABLISHED)
             {
@@ -219,7 +236,7 @@ namespace Layer2Telnet
             }
             else
             {
-                if (IsOpen)
+                if (_send_gratuitus_when_no_response && IsOpen)
                 {
                     if ((DateTime.Now - _last_read_available_time).TotalMilliseconds >= KEEP_ALIVE_PERIOD)
                     {
@@ -300,7 +317,7 @@ namespace Layer2Telnet
                 }
                 else if (_current_state == TCP_STATE.LAST_ACK && ACK)
                 {
-                    SendTcpCtrlPacket(_last_acknowledgment_number, TcpControlBits.Reset);
+                    // SendTcpCtrlPacket(_last_acknowledgment_number, TcpControlBits.Reset);
                     _current_state = TCP_STATE.CLOSED;
                 }
                 else if (_current_state == TCP_STATE.ESTABLISHED && RST) // 连接被重置
@@ -352,8 +369,8 @@ namespace Layer2Telnet
 
                 if (_current_state == TCP_STATE.TIME_WAIT)
                 {
-                    Thread.Sleep(100);
-                    SendTcpCtrlPacket(_last_acknowledgment_number, TcpControlBits.Reset);
+                    Thread.Sleep(500);
+                    // SendTcpCtrlPacket(_last_acknowledgment_number, TcpControlBits.Reset);
                     _current_state = TCP_STATE.CLOSED;
                     _connection_wait_handle.Set();
                 }
@@ -366,6 +383,11 @@ namespace Layer2Telnet
         }
 
         void SendTcpCtrlPacket(uint AcknowledgmentNumber, TcpControlBits CtrlBits)
+        {
+            SendTcpCtrlPacket(AcknowledgmentNumber, CtrlBits, TcpOptions.None);
+        }
+
+        void SendTcpCtrlPacket(uint AcknowledgmentNumber, TcpControlBits CtrlBits, TcpOptions TcpOptions)
         {
             _last_acknowledgment_number = AcknowledgmentNumber;
             EthernetLayer ethernetLayer =
@@ -390,12 +412,12 @@ namespace Layer2Telnet
                 {
                     Source = _adapter.IP,
                     CurrentDestination = _remote_ip,
-                    Fragmentation = IpV4Fragmentation.None,
+                    Fragmentation = new IpV4Fragmentation(IpV4FragmentationOptions.DoNotFragment, 0),
                     HeaderChecksum = null, // Will be filled automatically.
-                    Identification = 123,
+                    Identification = _current_ip_id++,
                     Options = IpV4Options.None,
                     Protocol = null, // Will be filled automatically.
-                    Ttl = 100,
+                    Ttl = TTL,
                     TypeOfService = 0,
                 };
 
@@ -410,10 +432,7 @@ namespace Layer2Telnet
                     ControlBits = CtrlBits,
                     Window = _local_tcp_window_size,
                     UrgentPointer = 0,
-                    Options = new TcpOptions(
-                        new TcpOptionMaximumSegmentSize(1460),
-                        new TcpOptionWindowScale(0)
-                        )
+                    Options = TcpOptions
                 };
 
             if (_adapter.VLAN > 1)
@@ -456,12 +475,12 @@ namespace Layer2Telnet
                 {
                     Source = _adapter.IP,
                     CurrentDestination = _remote_ip,
-                    Fragmentation = IpV4Fragmentation.None,
+                    Fragmentation = new IpV4Fragmentation(IpV4FragmentationOptions.DoNotFragment, 0),
                     HeaderChecksum = null, // Will be filled automatically.
-                    Identification = 123,
+                    Identification = _current_ip_id++,
                     Options = IpV4Options.None,
                     Protocol = null, // Will be filled automatically.
-                    Ttl = 100,
+                    Ttl = TTL,
                     TypeOfService = 0,
                 };
 
@@ -476,10 +495,7 @@ namespace Layer2Telnet
                     ControlBits = TcpControlBits.Push | TcpControlBits.Acknowledgment,
                     Window = _local_tcp_window_size,
                     UrgentPointer = 0,
-                    Options = new TcpOptions(
-                        new TcpOptionMaximumSegmentSize(1460),
-                        new TcpOptionWindowScale(0)
-                        )
+                    Options = TcpOptions.None
                 };
 
             PayloadLayer payloadLayer = new PayloadLayer();
