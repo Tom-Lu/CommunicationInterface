@@ -132,11 +132,13 @@ namespace Communication.Interface.Implementation
                 {
                     case -1:
                         {
+                            /*
                             if (!GoAhead)
                             {
                                 Write(new byte[] {(byte)TELNET_CMD.IAC, (byte)TELNET_CMD.DO, (byte)TELNET_OPT.SGA});
                                 GoAhead = true;
                             }
+                            */
                         }
                         break;
                     case (int)TELNET_CMD.IAC:
