@@ -52,8 +52,12 @@ namespace Communication.Interface.Implementation
         {
             if (tcp_client != null && ip_end_point != null)
             {
-                tcp_client.Connect(ip_end_point);
-                stream = tcp_client.GetStream();
+                try
+                {
+                    tcp_client.Connect(ip_end_point);
+                    stream = tcp_client.GetStream();
+                }
+                catch { }
             }
         }
 
