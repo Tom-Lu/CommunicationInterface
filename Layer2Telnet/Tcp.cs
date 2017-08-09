@@ -39,6 +39,7 @@ namespace Layer2Telnet
         private const ushort DISCONNECT_TIMEOUT = 2000;
         private const ushort TCP_OPEN_TIMEOUT = 1000;
         private const ushort KEEP_ALIVE_PERIOD = 500;
+        private const ushort WRITE_RETRY_INTERVAL = 500;
         private const byte TTL = 128;
         private const ushort MAX_SEGMENT_SIZE = 1460;
         private const byte WINDOW_SCALE = 8;
@@ -54,11 +55,15 @@ namespace Layer2Telnet
         private TCP_STATE _current_state = TCP_STATE.CLOSED;
         private ushort _current_ip_id = 30000;
         private uint _current_sequence_number = 0;
+        private uint _next_ack_num = 0;
         private uint _last_acknowledgment_number = 0;
         private ushort _local_tcp_window_size = 65535;
         private ushort _remote_tcp_window_size = 0;
         private DateTime _last_read_available_time = DateTime.Now;
         private ManualResetEvent _connection_wait_handle = new ManualResetEvent(false);
+        private bool _ack_status = true;
+        private object _ack_status_lock = new object();
+
         private Queue<byte> InputBuffer;
         private object InputBufferLocker = new Object();
         private VirtualAdapter Adapter = null;
@@ -330,7 +335,17 @@ namespace Layer2Telnet
                     {
                         SendTcpCtrlPacket(_last_acknowledgment_number, TcpControlBits.Acknowledgment);
                     }
-                    else // if (tcp.SequenceNumber == _last_acknowledgment_number)
+                    else if (ACK && tcp.AcknowledgmentNumber >= _next_ack_num)
+                    {
+                        _current_sequence_number = _next_ack_num;
+                        lock (_ack_status_lock)
+                        {
+                            _ack_status = true;
+                        }
+                    }
+
+                    // 只处理顺序正确的数据包
+                    if (tcp.SequenceNumber == _last_acknowledgment_number)
                     {
                         try
                         {
@@ -341,23 +356,38 @@ namespace Layer2Telnet
                                 do
                                 {
                                     data = PayloadStream.Read();
-                                    if(data != -1)
+                                    if (data != -1)
                                     {
                                         InputBuffer.Enqueue((byte)data);
                                     }
 
-                                }while(data != -1);
+                                } while (data != -1);
                             }
 
                             SendTcpCtrlPacket(tcp.SequenceNumber + (uint)tcp.PayloadLength, TcpControlBits.Acknowledgment);
-                        } catch {}
+                        }
+                        catch { }
                     }
+                    else
+                    {
+                        // 对于顺序不正确的包，告诉远端下一个包的顺序应该是多少
+                        SendTcpCtrlPacket(_last_acknowledgment_number, TcpControlBits.Acknowledgment);
+                    }
+
                 }
                 else if (ACK && _current_state == TCP_STATE.ESTABLISHED)
                 {
                     if (tcp.SequenceNumber == _last_acknowledgment_number - 1) // Keep Alive
                     {
                         SendTcpCtrlPacket(_last_acknowledgment_number, TcpControlBits.Acknowledgment);
+                    }
+                    else if (tcp.AcknowledgmentNumber >= _next_ack_num)
+                    {
+                        _current_sequence_number = _next_ack_num;
+                        lock (_ack_status_lock)
+                        {
+                            _ack_status = true;
+                        }
                     }
                 }
 
@@ -447,10 +477,11 @@ namespace Layer2Telnet
             if (CtrlBits != TcpControlBits.Acknowledgment)
             {
                 _current_sequence_number++;
+                _next_ack_num = _current_sequence_number;
             }
         }
 
-        public void SendPacket(byte[] data)
+        public void SendPacketInternal(byte[] data)
         {
             Packet packet = null;
             EthernetLayer ethernetLayer =
@@ -514,7 +545,7 @@ namespace Layer2Telnet
                         Array.Copy(data, offset, send_buffer, 0, _remote_tcp_window_size);
                         payloadLayer.Data = new Datagram(send_buffer);
                         offset += _remote_tcp_window_size;
-                        _current_sequence_number += _remote_tcp_window_size;
+                        _next_ack_num = _current_sequence_number + _remote_tcp_window_size;
                     }
                     else
                     {
@@ -522,7 +553,7 @@ namespace Layer2Telnet
                         Array.Copy(data, offset, send_buffer, 0, data_to_send);
                         payloadLayer.Data = new Datagram(send_buffer);
                         offset += data_to_send;
-                        _current_sequence_number += data_to_send;
+                        _next_ack_num = _current_sequence_number + data_to_send;
                     }
                     data_to_send = (uint)data.Length - offset - 1;
 
@@ -538,7 +569,7 @@ namespace Layer2Telnet
             }
             else
             {
-                _current_sequence_number += (uint)data.Length;
+                _next_ack_num = _current_sequence_number + (uint)data.Length;
                 payloadLayer.Data = new Datagram(data);
 
                 if (_adapter.VLAN > 1)
@@ -548,6 +579,41 @@ namespace Layer2Telnet
                 else
                 {
                     VirtualNetwork.Instance.SendPacket(PacketBuilder.Build(DateTime.Now, ethernetLayer, ipV4Layer, tcpLayer, payloadLayer));               
+                }
+            }
+        }
+
+        public void SendPacket(byte[] data)
+        {
+            lock (_ack_status_lock)
+            {
+                _ack_status = false;
+            }
+
+            DateTime start_time = DateTime.Now;
+            DateTime last_send_time = DateTime.Now;
+
+            SendPacketInternal(data);
+
+            while (!_ack_status && ((DateTime.Now - start_time).TotalMilliseconds < (WriteTimeout * 1000)))
+            {
+                Thread.Sleep(50);
+                if ((DateTime.Now - last_send_time).TotalMilliseconds >= WRITE_RETRY_INTERVAL)
+                {
+                    last_send_time = DateTime.Now;
+                    SendPacketInternal(data);
+                }
+            }
+
+            if (!_ack_status)
+            {
+                if (_current_state == TCP_STATE.CLOSED)
+                {
+                    System.Console.WriteLine("Connection closed by remote host!");
+                }
+                else
+                {
+                    System.Console.WriteLine("No ack from remote host!");
                 }
             }
         }

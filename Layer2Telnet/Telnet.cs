@@ -37,10 +37,9 @@ namespace Layer2Telnet
 
         private const ushort CONNECTION_TIMEOUT = 20000;
         private const ushort DISCONNECT_TIMEOUT = 2000;
-        private const ushort WRITE_TIMEOUT = 10000;
-        private const ushort WRITE_RETRY_INTERVAL = 500;
         private const ushort TCP_OPEN_TIMEOUT = 1000;
         private const ushort KEEP_ALIVE_PERIOD = 500;
+        private const ushort WRITE_RETRY_INTERVAL = 500;
         private const byte TTL = 128;
         private const ushort MAX_SEGMENT_SIZE = 1460;
         private const byte WINDOW_SCALE = 8;
@@ -53,7 +52,6 @@ namespace Layer2Telnet
         private ushort _remote_port;
         private bool _response_telnet_ctrl = true;
         private bool _send_gratuitus_when_no_response = true;
-        private bool GoAhead = false;
 
         private TCP_STATE _current_state = TCP_STATE.CLOSED;
         private ushort _current_ip_id = 30000;
@@ -353,6 +351,7 @@ namespace Layer2Telnet
                         }
                     }
 
+                    // 只处理顺序正确的数据包
                     if (tcp.SequenceNumber == _last_acknowledgment_number)
                     {
                         try
@@ -368,6 +367,11 @@ namespace Layer2Telnet
 
                             SendTcpCtrlPacket(tcp.SequenceNumber + (uint)tcp.PayloadLength, TcpControlBits.Acknowledgment);
                         } catch {}
+                    }
+                    else
+                    {
+                        // 对于顺序不正确的包，告诉远端下一个包的顺序应该是多少
+                        SendTcpCtrlPacket(_last_acknowledgment_number, TcpControlBits.Acknowledgment);
                     }
 
                 }
@@ -591,7 +595,7 @@ namespace Layer2Telnet
 
             SendPacketInternal(data);
 
-            while (!_ack_status && ((DateTime.Now - start_time).TotalMilliseconds < WRITE_TIMEOUT))
+            while (!_ack_status && ((DateTime.Now - start_time).TotalMilliseconds < (WriteTimeout * 1000)))
             {
                 Thread.Sleep(50);
                 if ((DateTime.Now - last_send_time).TotalMilliseconds >= WRITE_RETRY_INTERVAL)
@@ -605,11 +609,11 @@ namespace Layer2Telnet
             {
                 if (_current_state == TCP_STATE.CLOSED)
                 {
-                    throw new Exception("Connection closed by remote host!");
+                    System.Console.WriteLine("Connection closed by remote host!");
                 }
                 else
                 {
-                    throw new Exception("No ack from remote host!");
+                    System.Console.WriteLine("No ack from remote host!");
                 }
             }
         }
