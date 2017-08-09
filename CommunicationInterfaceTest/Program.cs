@@ -41,7 +41,7 @@ namespace Communication.Interface.Test
             if (CommInterface.IsOpened)
             {
                 CommunicationManager.GetViewer().AddDisplayFilter("\n\r", "\r\n");
-                CommInterface.Timeout = 10;
+                CommInterface.ReadTimeout = 10;
                 CommInterface.LineFeed = "\r\n";
 
                 bool login = CommInterface.WaitForString("Login:", 10);

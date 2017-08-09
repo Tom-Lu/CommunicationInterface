@@ -55,6 +55,7 @@ namespace Communication.Interface.Implementation
                 try
                 {
                     tcp_client.Connect(ip_end_point);
+                    tcp_client.SendTimeout = (int)(WriteTimeout * 1000);
                     stream = tcp_client.GetStream();
                 }
                 catch { }

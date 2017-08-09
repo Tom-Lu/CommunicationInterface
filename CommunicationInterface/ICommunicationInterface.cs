@@ -59,7 +59,12 @@ namespace Communication.Interface
         /// <summary>
         /// Default timeout(seconds) for all read operation when timeout is not specified
         /// </summary>
-        double Timeout { get; set; }
+        double ReadTimeout { get; set; }
+
+        /// <summary>
+        /// Default timeout(seconds) for all write operation
+        /// </summary>
+        double WriteTimeout { get; set; }
 
         /// <summary>
         /// Friendly Name for represent current interface instance  

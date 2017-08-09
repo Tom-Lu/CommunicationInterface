@@ -31,7 +31,8 @@ namespace Communication.Interface.Implementation
             global_buffer = new Buffer(DefaultGlobalBufferSize);
             fragment_buffer = new Buffer(DefaultFragmentBufferSize);
             read_buffer = new Buffer(DefaultReadBufferSize);
-            Timeout = 10;
+            ReadTimeout = 10;
+            WriteTimeout = 10;
             StopToken = string.Empty;
             LineFeed = DEFAULT_LINE_FEED;
             WriteReadInterval = 0.1;
@@ -95,7 +96,8 @@ namespace Communication.Interface.Implementation
         public IBuffer FragmentBuffer { get { return (IBuffer)fragment_buffer; } }
         public IBuffer GlobalBuffer { get { return (IBuffer)global_buffer; } }
 
-        public double Timeout { get; set; }
+        public double ReadTimeout { get; set; }
+        public double WriteTimeout { get; set; }
         abstract public void Flush();
         abstract public void Open();
         abstract public void Close();
@@ -248,7 +250,7 @@ namespace Communication.Interface.Implementation
 
             Write(command);
             Thread.Sleep((int)(WriteReadInterval * 1000));
-            Status = WaitForString(StopToken, Timeout);
+            Status = WaitForString(StopToken, ReadTimeout);
 
             last_read_buffer.Append(read_buffer.ToString());
             ((IBufferInternal)read_buffer).Copy(last_read_buffer);

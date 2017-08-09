@@ -16,7 +16,6 @@ namespace Communication.Interface.Implementation
         private IPEndPoint ip_end_point = null;
         private TcpClient tcp_client = null;
         private NetworkStream stream = null;
-        private bool GoAhead = false;
 
         public Telnet(string IpAddress, int Port) : base()
         {
@@ -56,6 +55,7 @@ namespace Communication.Interface.Implementation
                 try
                 {
                     tcp_client.Connect(ip_end_point);
+                    tcp_client.SendTimeout = (int)(WriteTimeout * 1000);
                     stream = tcp_client.GetStream();
                 }
                 catch { }
