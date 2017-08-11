@@ -539,7 +539,7 @@ namespace Layer2Telnet
                 {
                     tcpLayer.SequenceNumber = _current_sequence_number;
 
-                    if (data_to_send > _remote_tcp_window_size)
+                    if (data_to_send > _remote_tcp_window_size && _remote_tcp_window_size > 0)
                     {
                         byte[] send_buffer = new byte[_remote_tcp_window_size];
                         Array.Copy(data, offset, send_buffer, 0, _remote_tcp_window_size);
