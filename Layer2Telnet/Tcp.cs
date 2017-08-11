@@ -593,7 +593,11 @@ namespace Layer2Telnet
             DateTime start_time = DateTime.Now;
             DateTime last_send_time = DateTime.Now;
 
-            SendPacketInternal(data);
+            try
+            {
+                SendPacketInternal(data);
+            }
+            catch { }
 
             while (!_ack_status && ((DateTime.Now - start_time).TotalMilliseconds < (WriteTimeout * 1000)))
             {
@@ -601,7 +605,10 @@ namespace Layer2Telnet
                 if ((DateTime.Now - last_send_time).TotalMilliseconds >= WRITE_RETRY_INTERVAL)
                 {
                     last_send_time = DateTime.Now;
-                    SendPacketInternal(data);
+                    try
+                    {
+                        SendPacketInternal(data);
+                    }catch { }
                 }
             }
 
