@@ -241,6 +241,7 @@ namespace Communication.Interface
         public static void Cleanup()
         {
             GetViewer().Release();
+            viewer = null;
         } 
     }
 }
