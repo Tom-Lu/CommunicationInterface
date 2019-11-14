@@ -9,7 +9,7 @@ using System.Collections.Generic;
 
 namespace Communication.Interface.Implementation
 {
-    [InterfaceImplementation(Name = "PlinkSsh", Scheme = "PlinkSsh", ConfigPanel = typeof(Panel.SshPanel))]
+    [InterfaceImplementation(Name = "Ssh", Scheme = "Ssh", ConfigPanel = typeof(Panel.SshPanel))]
     public class PlinkSsh : AbsCommunicationInterface
     {
         private static string PLINK_PATH = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "plink_mod.exe");
@@ -25,6 +25,13 @@ namespace Communication.Interface.Implementation
         public PlinkSsh(string IpAddress, int Port) : base()
         {
             OutputBuffer = new Queue<byte>();
+
+            PLINK_PATH = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "plink_mod.exe");
+            if(!File.Exists(PLINK_PATH))
+            {
+                PLINK_PATH = "plink_mod.exe";
+            }
+
             Plink = new ProcessStartInfo()
             {
                 FileName = PLINK_PATH,
@@ -35,7 +42,7 @@ namespace Communication.Interface.Implementation
                 WindowStyle = ProcessWindowStyle.Hidden | ProcessWindowStyle.Minimized,
                 CreateNoWindow = true
             };
-            Plink.Arguments = String.Format("-P {0} {1}", Port, IpAddress);
+            Plink.Arguments = String.Format("-ssh {0} -P {1} -x -batch -auto_store_sshkey", Port, IpAddress);
 
         }
 
@@ -48,6 +55,13 @@ namespace Communication.Interface.Implementation
             }
 
             OutputBuffer = new Queue<byte>();
+
+            PLINK_PATH = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "plink_mod.exe");
+            if (!File.Exists(PLINK_PATH))
+            {
+                PLINK_PATH = "plink_mod.exe";
+            }
+
             Plink = new ProcessStartInfo()
             {
                 FileName = PLINK_PATH,
@@ -59,24 +73,24 @@ namespace Communication.Interface.Implementation
                 CreateNoWindow = true
             };
 
-            Plink.Arguments = string.Empty;
+            Plink.Arguments = String.Format("-ssh {0} -P {1}", Config["IP"], int.Parse(Config["Port"]));
 
             if (Config.ContainsKey("Key") && !Config["Key"].Equals(string.Empty))
             {
-                Plink.Arguments += String.Format("-i {0} ", Config["Key"]);
+                Plink.Arguments += String.Format(" -i {0} ", Config["Key"]);
             }
 
             if (Config.ContainsKey("Username") && !Config["Username"].Equals(string.Empty))
             {
-                Plink.Arguments += String.Format("-l {0} ", Config["Username"]);
+                Plink.Arguments += String.Format(" -l {0}", Config["Username"]);
             }
 
             if (Config.ContainsKey("Password") && !Config["Password"].Equals(string.Empty))
             {
-                Plink.Arguments += String.Format("-pw {0} ", Config["Password"]);
+                Plink.Arguments += String.Format(" -pw {0} ", Config["Password"]);
             }
 
-            Plink.Arguments += String.Format("-P {0} {1} -ssh -batch -auto_store_sshkey", int.Parse(Config["Port"]), Config["IP"]);
+            Plink.Arguments += " -x -batch -auto_store_sshkey";
         }
 
         override public bool IsOpened
@@ -85,7 +99,7 @@ namespace Communication.Interface.Implementation
             {
                 try
                 {
-                    return PlinkProcess != null && !PlinkProcess.HasExited;
+                    return PlinkProcess != null && !PlinkProcess.HasExited && !OutputStream.EndOfStream;
                 }
                 catch
                 {

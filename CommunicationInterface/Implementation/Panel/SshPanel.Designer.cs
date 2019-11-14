@@ -72,16 +72,16 @@
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(346, 110);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(346, 114);
             this.tableLayoutPanel1.TabIndex = 1;
             // 
             // SshKeyFile
             // 
             this.tableLayoutPanel1.SetColumnSpan(this.SshKeyFile, 3);
             this.SshKeyFile.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.SshKeyFile.Location = new System.Drawing.Point(86, 84);
+            this.SshKeyFile.Location = new System.Drawing.Point(73, 81);
             this.SshKeyFile.Name = "SshKeyFile";
-            this.SshKeyFile.Size = new System.Drawing.Size(199, 21);
+            this.SshKeyFile.Size = new System.Drawing.Size(208, 20);
             this.SshKeyFile.TabIndex = 10;
             this.SshKeyFile.TextChanged += new System.EventHandler(this.ConfigChange);
             // 
@@ -89,9 +89,9 @@
             // 
             this.label10.AutoSize = true;
             this.label10.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label10.Location = new System.Drawing.Point(3, 27);
+            this.label10.Location = new System.Drawing.Point(3, 26);
             this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(77, 27);
+            this.label10.Size = new System.Drawing.Size(64, 26);
             this.label10.TabIndex = 3;
             this.label10.Text = "Port:";
             this.label10.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -100,9 +100,9 @@
             // 
             this.tableLayoutPanel1.SetColumnSpan(this.SshPort, 4);
             this.SshPort.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.SshPort.Location = new System.Drawing.Point(86, 30);
+            this.SshPort.Location = new System.Drawing.Point(73, 29);
             this.SshPort.Name = "SshPort";
-            this.SshPort.Size = new System.Drawing.Size(257, 21);
+            this.SshPort.Size = new System.Drawing.Size(270, 20);
             this.SshPort.TabIndex = 23;
             this.SshPort.Text = "22";
             this.SshPort.TextChanged += new System.EventHandler(this.ConfigChange);
@@ -113,7 +113,7 @@
             this.label9.Dock = System.Windows.Forms.DockStyle.Fill;
             this.label9.Location = new System.Drawing.Point(3, 0);
             this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(77, 27);
+            this.label9.Size = new System.Drawing.Size(64, 26);
             this.label9.TabIndex = 3;
             this.label9.Text = "IP Address:";
             this.label9.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -122,9 +122,9 @@
             // 
             this.tableLayoutPanel1.SetColumnSpan(this.SshIP, 4);
             this.SshIP.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.SshIP.Location = new System.Drawing.Point(86, 3);
+            this.SshIP.Location = new System.Drawing.Point(73, 3);
             this.SshIP.Name = "SshIP";
-            this.SshIP.Size = new System.Drawing.Size(257, 21);
+            this.SshIP.Size = new System.Drawing.Size(270, 20);
             this.SshIP.TabIndex = 2;
             this.SshIP.Text = "192.168.1.100";
             this.SshIP.TextChanged += new System.EventHandler(this.ConfigChange);
@@ -133,9 +133,9 @@
             // 
             this.label14.AutoSize = true;
             this.label14.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label14.Location = new System.Drawing.Point(3, 54);
+            this.label14.Location = new System.Drawing.Point(3, 52);
             this.label14.Name = "label14";
-            this.label14.Size = new System.Drawing.Size(77, 27);
+            this.label14.Size = new System.Drawing.Size(64, 26);
             this.label14.TabIndex = 24;
             this.label14.Text = "Username:";
             this.label14.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -143,9 +143,9 @@
             // SshUsername
             // 
             this.SshUsername.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.SshUsername.Location = new System.Drawing.Point(86, 57);
+            this.SshUsername.Location = new System.Drawing.Point(73, 55);
             this.SshUsername.Name = "SshUsername";
-            this.SshUsername.Size = new System.Drawing.Size(64, 21);
+            this.SshUsername.Size = new System.Drawing.Size(70, 20);
             this.SshUsername.TabIndex = 25;
             this.SshUsername.TextChanged += new System.EventHandler(this.ConfigChange);
             // 
@@ -153,9 +153,9 @@
             // 
             this.label15.AutoSize = true;
             this.label15.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label15.Location = new System.Drawing.Point(156, 54);
+            this.label15.Location = new System.Drawing.Point(149, 52);
             this.label15.Name = "label15";
-            this.label15.Size = new System.Drawing.Size(59, 27);
+            this.label15.Size = new System.Drawing.Size(56, 26);
             this.label15.TabIndex = 26;
             this.label15.Text = "Password:";
             this.label15.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -164,9 +164,9 @@
             // 
             this.tableLayoutPanel1.SetColumnSpan(this.SshPassword, 2);
             this.SshPassword.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.SshPassword.Location = new System.Drawing.Point(221, 57);
+            this.SshPassword.Location = new System.Drawing.Point(211, 55);
             this.SshPassword.Name = "SshPassword";
-            this.SshPassword.Size = new System.Drawing.Size(122, 21);
+            this.SshPassword.Size = new System.Drawing.Size(132, 20);
             this.SshPassword.TabIndex = 27;
             this.SshPassword.TextChanged += new System.EventHandler(this.ConfigChange);
             // 
@@ -174,9 +174,9 @@
             // 
             this.label16.AutoSize = true;
             this.label16.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label16.Location = new System.Drawing.Point(3, 81);
+            this.label16.Location = new System.Drawing.Point(3, 78);
             this.label16.Name = "label16";
-            this.label16.Size = new System.Drawing.Size(77, 29);
+            this.label16.Size = new System.Drawing.Size(64, 36);
             this.label16.TabIndex = 28;
             this.label16.Text = "Private Key:";
             this.label16.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -184,9 +184,9 @@
             // SshKeyBrowse
             // 
             this.SshKeyBrowse.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.SshKeyBrowse.Location = new System.Drawing.Point(291, 84);
+            this.SshKeyBrowse.Location = new System.Drawing.Point(287, 81);
             this.SshKeyBrowse.Name = "SshKeyBrowse";
-            this.SshKeyBrowse.Size = new System.Drawing.Size(52, 23);
+            this.SshKeyBrowse.Size = new System.Drawing.Size(56, 30);
             this.SshKeyBrowse.TabIndex = 11;
             this.SshKeyBrowse.Text = "Browse";
             this.SshKeyBrowse.UseVisualStyleBackColor = true;
@@ -194,11 +194,11 @@
             // 
             // SshPanel
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.tableLayoutPanel1);
             this.Name = "SshPanel";
-            this.Size = new System.Drawing.Size(346, 146);
+            this.Size = new System.Drawing.Size(346, 158);
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();
             this.ResumeLayout(false);
