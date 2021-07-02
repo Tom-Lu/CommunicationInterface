@@ -1,174 +1,55 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{DE0D2D05-8579-4049-BB9C-34297E292F8C}</ProjectGuid>
+    <TargetFramework>net5.0-windows</TargetFramework>
     <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Communication.Interface</RootNamespace>
-    <AssemblyName>Communication.Interface</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
+    <Deterministic>false</Deterministic>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <DocumentationFile>
-    </DocumentationFile>
+    <DocumentationFile></DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Release\Communication.Interface.XML</DocumentationFile>
+    <NoWarn>1701;1702;1591</NoWarn>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Implementation\PlinkTelnet.cs" />
-    <Compile Include="Implementation\Tcp.cs" />
-    <Compile Include="Interop\Win32Window.cs" />
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <Compile Include="UI\BufferPanel.cs">
+    <Compile Update="UI\BufferPanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="UI\BufferPanel.Designer.cs">
-      <DependentUpon>BufferPanel.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Implementation\Panel\AbsConfigPanel.cs">
+    <Compile Update="Implementation\Panel\AbsConfigPanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Implementation\Panel\SshPanel.cs">
+    <Compile Update="Implementation\Panel\SshPanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Implementation\Panel\SshPanel.Designer.cs">
-      <DependentUpon>SshPanel.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Implementation\Panel\IpPortPanel.cs">
+    <Compile Update="Implementation\Panel\IpPortPanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Implementation\Panel\IpPortPanel.Designer.cs">
-      <DependentUpon>IpPortPanel.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Implementation\Panel\SerialPortPanel.cs">
+    <Compile Update="Implementation\Panel\SerialPortPanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Implementation\Panel\SerialPortPanel.Designer.cs">
-      <DependentUpon>SerialPortPanel.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Implementation\AbsCommunicationInterface.cs" />
-    <Compile Include="Implementation\Buffer.cs" />
-    <Compile Include="CommunicationManager.cs" />
-    <Compile Include="UI\CommunicationBuilder.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="UI\CommunicationBuilder.Designer.cs">
-      <DependentUpon>CommunicationBuilder.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Implementation\PlinkSsh.cs" />
-    <Compile Include="Implementation\SerialTel.cs" />
-    <Compile Include="InterfaceImplementation.cs" />
-    <Compile Include="IBuffer.cs" />
-    <Compile Include="IBufferInternal.cs" />
-    <Compile Include="ICommunicationInterface.cs" />
-    <Compile Include="InterfaceImplementationAttribute.cs" />
-    <Compile Include="IConfigPanel.cs" />
-    <Compile Include="Interop\Win32Interop.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Implementation\SerialPort.cs" />
-    <Compile Include="Implementation\Telnet.cs" />
-    <Compile Include="UI\CommunicationChannel.cs">
+    <Compile Update="UI\CommunicationChannel.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="UI\CommunicationIndicator.cs">
+    <Compile Update="UI\CommunicationIndicator.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="UI\CommunicationIndicator.Designer.cs">
-      <DependentUpon>CommunicationIndicator.cs</DependentUpon>
-    </Compile>
-    <Compile Include="UI\CommunicationViewer.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="UI\CommunicationViewer.Designer.cs">
-      <DependentUpon>CommunicationViewer.cs</DependentUpon>
-    </Compile>
-    <Compile Include="ICommunicationViewer.cs" />
-    <Compile Include="UI\Utility.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="UI\CommunicationBuilder.resx">
-      <DependentUpon>CommunicationBuilder.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="UI\BufferPanel.resx">
-      <DependentUpon>BufferPanel.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Implementation\Panel\SshPanel.resx">
-      <DependentUpon>SshPanel.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Implementation\Panel\IpPortPanel.resx">
-      <DependentUpon>IpPortPanel.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Implementation\Panel\SerialPortPanel.resx">
-      <DependentUpon>SerialPortPanel.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <EmbeddedResource Include="UI\CommunicationIndicator.resx">
-      <DependentUpon>CommunicationIndicator.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="UI\CommunicationViewer.resx">
-      <DependentUpon>CommunicationViewer.cs</DependentUpon>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Images\Copy.png" />
     <Content Include="plink_mod.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <None Include="Images\Save.png" />
-    <None Include="Images\icon_script.ico" />
-    <None Include="Images\Transparent.png" />
-    <None Include="Images\Bring_To_Front.png" />
     <Content Include="Images\Clear.png" />
-    <None Include="Images\Dock.png" />
     <Content Include="Images\FindNextHS.png" />
-    <None Include="Images\Follow.png" />
     <Content Include="Images\FontHS.png" />
     <Content Include="Images\HighlightHS.png" />
     <Content Include="Images\InputDisable.png" />
     <Content Include="Images\InputEnable.png" />
   </ItemGroup>
-  <ItemGroup />
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+    <PackageReference Include="System.IO.Ports" Version="5.0.1" />
+  </ItemGroup>
 </Project>
