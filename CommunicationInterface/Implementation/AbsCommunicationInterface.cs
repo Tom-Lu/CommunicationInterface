@@ -89,6 +89,8 @@ namespace Communication.Interface.Implementation
         public bool WriteEcho { get; set; }
         public double WriteReadInterval { get; set; }
         public double WriteReadLoopInterval { get; set; }
+        public CancellationTokenSource CancellationToken { get; set; }
+
 
         public string FriendlyName { get { return friendly_name; } }
         public string ConfigString { get { return config_string; } }
@@ -120,14 +122,14 @@ namespace Communication.Interface.Implementation
                 do
                 {
                     last_read_buffer.Append(ReadAll());
-                } while (true);
+                } while (!IsCanceled());
             }
             else
             {
                 do
                 {
                     last_read_buffer.Append(ReadAll());
-                } while (((DateTime.Now - start_time).TotalSeconds < Timespan));
+                } while (((DateTime.Now - start_time).TotalSeconds < Timespan) && !IsCanceled());
             }
 
             ((IBufferInternal)read_buffer).Copy(last_read_buffer);
@@ -154,7 +156,7 @@ namespace Communication.Interface.Implementation
                         }
                     }
                 }
-            } while (data != -1);
+            } while (data != -1 && !IsCanceled());
 
             if (!read_buffer.IsEmpty())
             {
@@ -178,7 +180,7 @@ namespace Communication.Interface.Implementation
             {
                 last_read_buffer.Append(ReadUntil(Pattern));
                 Thread.Sleep(100);
-            } while (!last_read_buffer.ToString().Contains(Pattern) && ((DateTime.Now - start_time).TotalSeconds < Timeout));
+            } while (!last_read_buffer.ToString().Contains(Pattern) && ((DateTime.Now - start_time).TotalSeconds < Timeout) && !IsCanceled());
 
             ((IBufferInternal)read_buffer).Copy(last_read_buffer);
             return read_buffer.ToString().Contains(Pattern);
@@ -205,7 +207,7 @@ namespace Communication.Interface.Implementation
                     quiet_status = ((DateTime.Now - last_respond).TotalSeconds >= QuietTime);
                 }
             }
-            while (!quiet_status && ((DateTime.Now - start_time).TotalSeconds < Timeout));
+            while (!quiet_status && ((DateTime.Now - start_time).TotalSeconds < Timeout) && !IsCanceled());
             ((IBufferInternal)read_buffer).Copy(last_read_buffer);
             return quiet_status;
         }
@@ -268,7 +270,7 @@ namespace Communication.Interface.Implementation
                 WriteWaitToken(Command);
                 last_read_buffer.Append(read_buffer.ToString());
                 Thread.Sleep((int)(WriteReadLoopInterval * 1000));
-            } while (!last_read_buffer.ToString().Contains(Pattern) && ((DateTime.Now - start_time).TotalSeconds < Timeout));
+            } while (!last_read_buffer.ToString().Contains(Pattern) && ((DateTime.Now - start_time).TotalSeconds < Timeout) && !IsCanceled());
 
             ((IBufferInternal)read_buffer).Copy(last_read_buffer);
             return read_buffer.ToString().Contains(Pattern);
@@ -294,6 +296,11 @@ namespace Communication.Interface.Implementation
         {
             fragment_buffer_record = false;
             return FragmentBuffer;
+        }
+
+        protected bool IsCanceled()
+        {
+            return CancellationToken != null && CancellationToken.IsCancellationRequested;
         }
 
         protected void TriggerBufferUpdateEvent(IBufferInternal ReadBuffer)

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace Communication.Interface
 {
@@ -90,6 +91,11 @@ namespace Communication.Interface
         /// Buffer for global read operation, contains all read content since interface opened
         /// </summary>
         IBuffer GlobalBuffer { get; }
+
+        /// <summary>
+        /// Cancellation Token Source
+        /// </summary>
+        CancellationTokenSource CancellationToken { get; set; }
 
         /// <summary>
         /// Read buffer content change event, trigger when read buffer changed/

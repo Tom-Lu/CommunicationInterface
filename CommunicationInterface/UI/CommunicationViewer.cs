@@ -6,10 +6,11 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using Communication.Interface.Interop;
 using System.Reflection;
 using System.Threading;
 using System.Collections;
+using System.Diagnostics;
+using Communication.Interface.Interop;
 
 namespace Communication.Interface.UI
 {
@@ -190,7 +191,8 @@ namespace Communication.Interface.UI
         private void StartUpdateTimer()
         {
             lastPosition = Win32Interop.Rect.Zero();
-            mainWindowHandle = Win32Window.GetCurrentProcessMainWindowHandle();
+
+            mainWindowHandle = Process.GetCurrentProcess().MainWindowHandle; // Win32Window.GetCurrentProcessMainWindowHandle();
             if (mainWindowHandle != IntPtr.Zero)
             {
                 windowUpdateTimer = new System.Threading.Timer(new TimerCallback(ViewerPosUpdateHandler), null, Timeout.Infinite, 300);
