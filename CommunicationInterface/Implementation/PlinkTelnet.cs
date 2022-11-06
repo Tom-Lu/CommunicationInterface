@@ -151,7 +151,7 @@ namespace Communication.Interface.Implementation
                 }
                 else
                 {
-                    InputStream.Write(Encoding.ASCII.GetString(data, 0, data.Length));
+                    InputStream.Write(Encoding.ASCII.GetString(data));
                 }
             }
         }

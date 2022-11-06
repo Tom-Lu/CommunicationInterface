@@ -23,11 +23,11 @@ namespace Communication.Interface.Test
 
             CommunicationManager.InitViewer(UI.DockType.Right);
             CommunicationManager.ShowViewer();
-            var Vn = Layer2Net.VirtualNetwork.Load("WAW-1P.network");
+            //var Vn = Layer2Net.VirtualNetwork.Load("WAW-1P.network");
             //Vn.Start();
-            var Va = Vn.GetAdapterByName("SOCKET_1");
+            // var Va = Vn.GetAdapterByName("SOCKET_1");
 
-            Va.AddArp("192.168.1.1", "00:11:22:33:44:66");
+            // Va.AddArp("192.168.1.1", "00:11:22:33:44:66");
             //bool ping = Va.PingUntilState("192.168.1.1", true, 5, 30, false);
 
             ICommunicationInterface CommInterface = CommunicationManager.InstanceInterface("L2Telnet:IP=192.168.1.1, Port=23, Adapter=SOCKET_1, ConfigFile=WAW-1P.network", "Zhone OLT");
@@ -66,7 +66,7 @@ namespace Communication.Interface.Test
             // Close communication interface
             CommInterface.Close();
             CommInterface = null;
-            Vn.Stop();
+            // Vn.Stop();
             CommunicationManager.HideViewer();
             CommunicationManager.Cleanup();
         }

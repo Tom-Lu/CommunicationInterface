@@ -42,7 +42,7 @@ namespace Communication.Interface.Implementation
                 WindowStyle = ProcessWindowStyle.Hidden | ProcessWindowStyle.Minimized,
                 CreateNoWindow = true
             };
-            Plink.Arguments = String.Format("-ssh {0} -P {1} -x -batch -auto_store_sshkey", Port, IpAddress);
+            Plink.Arguments = String.Format("-ssh {0} -P {1} -x -batch", Port, IpAddress);
 
         }
 
@@ -77,7 +77,7 @@ namespace Communication.Interface.Implementation
 
             if (Config.ContainsKey("Key") && !Config["Key"].Equals(string.Empty))
             {
-                Plink.Arguments += String.Format(" -i {0} ", Config["Key"]);
+                Plink.Arguments += String.Format(" -i {0}", Config["Key"]);
             }
 
             if (Config.ContainsKey("Username") && !Config["Username"].Equals(string.Empty))
@@ -87,10 +87,10 @@ namespace Communication.Interface.Implementation
 
             if (Config.ContainsKey("Password") && !Config["Password"].Equals(string.Empty))
             {
-                Plink.Arguments += String.Format(" -pw {0} ", Config["Password"]);
+                Plink.Arguments += String.Format(" -pw {0}", Config["Password"]);
             }
 
-            Plink.Arguments += " -x -batch -auto_store_sshkey";
+            Plink.Arguments += " -x -batch";
         }
 
         override public bool IsOpened
@@ -99,7 +99,7 @@ namespace Communication.Interface.Implementation
             {
                 try
                 {
-                    return PlinkProcess != null && !PlinkProcess.HasExited && !OutputStream.EndOfStream;
+                    return PlinkProcess != null && !PlinkProcess.HasExited;
                 }
                 catch
                 {
