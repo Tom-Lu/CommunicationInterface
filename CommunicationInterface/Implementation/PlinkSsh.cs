@@ -114,7 +114,8 @@ namespace Communication.Interface.Implementation
             {
                 AsyncReadBuffer = new byte[AsyncReadBufferLength];
                 PlinkProcess = Process.Start(Plink);
-                InputStream = PlinkProcess.StandardInput;
+				PlinkProcess.PriorityClass= ProcessPriorityClass.High;
+				InputStream = PlinkProcess.StandardInput;
                 OutputStream = PlinkProcess.StandardOutput;
                 BeginOutputStreamRead();
             }
