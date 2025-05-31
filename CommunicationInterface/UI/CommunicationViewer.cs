@@ -184,7 +184,16 @@ namespace Communication.Interface.UI
         {
             this.SafeInvoke(() =>
             {
+                StopUpdateTimer();
                 Close();
+                if(viewerThread != null && viewerThread.IsAlive)
+                {
+                    try
+                    {
+                        viewerThread.Interrupt();
+                    }
+                    catch { }
+                }
             });
         }
 
